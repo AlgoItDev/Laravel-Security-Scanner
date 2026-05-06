@@ -71,7 +71,7 @@ laravel-security-scanner/
 
 ```bash
 # 1. Clone / download
-git clone <repo>
+git clone https://github.com/AlgoItDev/Laravel-Security--Scanner.git
 cd laravel-security-scanner
 
 # 2. Create virtualenv
@@ -115,7 +115,7 @@ python main.py https://app.com --timeout 20
 
 - **Multiple Output Formats**: Console, JSON, TXT, HTML, and SARIF reports
 - **Progress Bar**: Real-time progress tracking with rich library during scans
-- **CI/CD Integration**: GitHub Actions workflow included (`.github/workflows/ci.yml`)
+- **CI/CD Integration**: GitHub Actions workflow included (`.github/workflows/ci.yml`) (Passive)
 - **Async Scanning**: Concurrent checks for faster results
 - **Comprehensive Checks**: 10 security checks covering critical Laravel vulnerabilities
 - **SARIF Support**: SARIF format output for GitHub Security tab integration
