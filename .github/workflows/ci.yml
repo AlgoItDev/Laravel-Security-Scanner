@@ -7,7 +7,7 @@ on:
     branches: [ main, develop ]
   schedule:
     # Run weekly on Sundays at 2am UTC
-    - cron: '0 2 * * 0'
+    - cron: '0 2 * * 0' 
 
 jobs:
   test:
