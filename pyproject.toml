@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "laravel-security-scanner"
-version = "1.1.0"
+version = "1.1.1"
 description = "Production-grade Python CLI tool for auditing Laravel web applications for common security misconfigurations"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -19,14 +19,11 @@ classifiers = [
     "Intended Audience :: System Administrators",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Topic :: Security",
-    "Topic :: Software Development :: Quality Assurance",
-    "Topic :: System :: Systems Administration",
     "Environment :: Console",
 ]
 dependencies = [
@@ -46,11 +43,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/laravel-security-scanner"
-Documentation = "https://github.com/yourusername/laravel-security-scanner#readme"
-Repository = "https://github.com/yourusername/laravel-security-scanner"
-Changelog = "https://github.com/yourusername/laravel-security-scanner/blob/main/CHANGELOG.md"
-Issues = "https://github.com/yourusername/laravel-security-scanner/issues"
+Homepage = "https://github.com/AlgoDev/Laravel-Security-Scanner"
+Repository = "https://github.com/AlgoDev/Laravel-Security-Scanner"
+Issues = "https://github.com/AlgoDev/Laravel-Security-Scanner/issues"
 
 [project.scripts]
 laravel-sec-scanner = "main:main"

@@ -1,5 +1,9 @@
 # 🔍 Laravel Security Scanner
 
+[![PyPI Version](https://img.shields.io/pypi/v/laravel-security-scanner)](https://pypi.org/project/laravel-security-scanner/)
+[![Python Version](https://img.shields.io/python/py-version/laravel-security-scanner)](https://pypi.org/project/laravel-security-scanner/)
+[![License: MIT](https://img.shields.io/pypi/l/laravel-security-scanner)](LICENSE)
+
 Production-grade Python CLI tool for auditing Laravel web applications for common security misconfigurations.
 
 ## 🎯 What It Checks
@@ -88,7 +92,15 @@ laravel-security-scanner/
 └── main.py
 ```
 
-## 🔧 Setup
+## 🚀 Installation
+
+### Via PyPI (Recommended)
+
+```bash
+pip install laravel-security-scanner
+```
+
+### Via Source
 
 ```bash
 # 1. Clone / download
@@ -111,28 +123,31 @@ cp .env.example .env
 
 ```bash
 # Scan a single target (all formats)
+laravel-sec-scanner https://your-laravel-app.com
+
+# Or using Python directly
 python main.py https://your-laravel-app.com
 
 # Multiple targets
-python main.py https://app1.com https://app2.com
+laravel-sec-scanner https://app1.com https://app2.com
 
 # JSON report only
-python main.py https://app.com --format json --output ./my-reports
+laravel-sec-scanner https://app.com --format json --output ./my-reports
 
 # HTML report only
-python main.py https://app.com --format html --output ./my-reports
+laravel-sec-scanner https://app.com --format html --output ./my-reports
 
 # SARIF report for GitHub Security tab
-python main.py https://app.com --format sarif --output ./my-reports
+laravel-sec-scanner https://app.com --format sarif --output ./my-reports
 
 # Skip SSL verification (e.g. staging with self-signed cert)
-python main.py https://staging.app.com --no-ssl-verify
+laravel-sec-scanner https://staging.app.com --no-ssl-verify
 
 # Set custom timeout
-python main.py https://app.com --timeout 20
+laravel-sec-scanner https://app.com --timeout 20
 
 # Run specific checks only
-python main.py https://app.com --checks ENV_EXPOSED,DEBUG_MODE,COMPOSER_CVE
+laravel-sec-scanner https://app.com --checks ENV_EXPOSED,DEBUG_MODE,COMPOSER_CVE
 ```
 
 ## 🎯 Features
@@ -151,6 +166,10 @@ python main.py https://app.com --checks ENV_EXPOSED,DEBUG_MODE,COMPOSER_CVE
 ## 🧪 Running Tests
 
 ```bash
+# Install dev dependencies
+pip install laravel-security-scanner[dev]
+
+# Run tests
 pytest tests/unit/ -v
 pytest tests/ -v --tb=short   # all tests
 ```
@@ -172,7 +191,7 @@ That's it — the `ScannerService` picks it up automatically.
 | `0` | All targets clean |
 | `1` | One or more vulnerabilities found |
 
-Useful for CI/CD pipelines: `python main.py https://app.com || echo "Security issues found!"`
+Useful for CI/CD pipelines: `laravel-sec-scanner https://app.com || echo "Security issues found!"`
 
 ## 📋 Changelog
 
