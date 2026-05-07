@@ -1,0 +1,2 @@
+[console_scripts]
+laravel-sec-scanner = main:main

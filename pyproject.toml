@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "laravel-security-scanner"
+version = "1.1.0"
+description = "Production-grade Python CLI tool for auditing Laravel web applications for common security misconfigurations"
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+authors = [
+    {name = "Laravel Security Scanner Team"}
+]
+keywords = ["laravel", "security", "scanner", "vulnerability", "audit", "cli"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Security",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: System :: Systems Administration",
+    "Environment :: Console",
+]
+dependencies = [
+    "httpx>=0.27.0",
+    "pydantic>=2.7.0",
+    "pydantic-settings>=2.3.0",
+    "loguru>=0.7.2",
+    "rich>=13.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2.0",
+    "pytest-asyncio>=0.23.0",
+    "black>=24.4.2",
+    "isort>=5.13.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/laravel-security-scanner"
+Documentation = "https://github.com/yourusername/laravel-security-scanner#readme"
+Repository = "https://github.com/yourusername/laravel-security-scanner"
+Changelog = "https://github.com/yourusername/laravel-security-scanner/blob/main/CHANGELOG.md"
+Issues = "https://github.com/yourusername/laravel-security-scanner/issues"
+
+[project.scripts]
+laravel-sec-scanner = "main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+exclude = ["logs*", "reports*"]
