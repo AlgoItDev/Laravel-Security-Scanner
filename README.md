@@ -1,7 +1,7 @@
 # 🔍 Laravel Security Scanner
 
 [![PyPI Version](https://img.shields.io/pypi/v/laravel-security-scanner)](https://pypi.org/project/laravel-security-scanner/)
-[![Python Version](https://img.shields.io/python/py-version/laravel-security-scanner)](https://pypi.org/project/laravel-security-scanner/)
+[![Python Version](https://img.shields.io/pypi/pyversions/pybadges.svg)](https://pypi.org/project/laravel-security-scanner/)
 [![License: MIT](https://img.shields.io/pypi/l/laravel-security-scanner)](LICENSE)
 
 Production-grade Python CLI tool for auditing Laravel web applications for common security misconfigurations.
