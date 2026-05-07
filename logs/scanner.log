@@ -364,3 +364,17 @@
 2026-05-07 00:22:02 | INFO     | app.services.reporter:save_txt:139 - TXT report saved: reports\scan_https___bbgayrimenkul_net_20260506_232202.txt
 2026-05-07 00:22:02 | INFO     | app.services.reporter:save_html:255 - HTML report saved: reports\scan_https___bbgayrimenkul_net_20260506_232202.html
 2026-05-07 00:22:02 | INFO     | app.services.reporter:save_sarif:345 - SARIF report saved: reports\scan_https___bbgayrimenkul_net_20260506_232202.sarif.json
+2026-05-07 01:04:50 | INFO     | __main__:main:125 - Laravel Security Scanner v1.0.0 starting
+2026-05-07 01:04:50 | INFO     | app.services.scanner:scan:56 - Starting scan for: https://bbgayrimenkul.net
+2026-05-07 01:04:54 | INFO     | app.services.scanner:_log_summary:117 - Scan complete | target=https://bbgayrimenkul.net | findings=15 | vulnerable=4 | risk_score=4.75 | duration=4.53s
+2026-05-07 01:04:54 | INFO     | app.services.reporter:save_json:104 - JSON report saved: reports\scan_https___bbgayrimenkul_net_20260507_000454.json
+2026-05-07 01:04:54 | INFO     | app.services.reporter:save_txt:139 - TXT report saved: reports\scan_https___bbgayrimenkul_net_20260507_000454.txt
+2026-05-07 01:04:54 | INFO     | app.services.reporter:save_html:255 - HTML report saved: reports\scan_https___bbgayrimenkul_net_20260507_000454.html
+2026-05-07 01:04:54 | INFO     | app.services.reporter:save_sarif:345 - SARIF report saved: reports\scan_https___bbgayrimenkul_net_20260507_000454.sarif.json
+2026-05-07 01:27:40 | INFO     | __main__:main:125 - Laravel Security Scanner v1.0.0 starting
+2026-05-07 01:27:40 | INFO     | app.services.scanner:scan:56 - Starting scan for: https://bbgayrimenkul.net
+2026-05-07 01:27:44 | INFO     | app.services.scanner:_log_summary:117 - Scan complete | target=https://bbgayrimenkul.net | findings=16 | vulnerable=4 | risk_score=4.75 | duration=4.62s
+2026-05-07 01:27:44 | INFO     | app.services.reporter:save_json:104 - JSON report saved: reports\scan_https___bbgayrimenkul_net_20260507_002744.json
+2026-05-07 01:27:44 | INFO     | app.services.reporter:save_txt:139 - TXT report saved: reports\scan_https___bbgayrimenkul_net_20260507_002744.txt
+2026-05-07 01:27:44 | INFO     | app.services.reporter:save_html:255 - HTML report saved: reports\scan_https___bbgayrimenkul_net_20260507_002744.html
+2026-05-07 01:27:44 | INFO     | app.services.reporter:save_sarif:345 - SARIF report saved: reports\scan_https___bbgayrimenkul_net_20260507_002744.sarif.json

@@ -17,6 +17,11 @@ Production-grade Python CLI tool for auditing Laravel web applications for commo
 | `MIX_MANIFEST_EXPOSED` | Laravel Mix manifest exposed | 🟢 LOW |
 | `HORIZON_EXPOSED` | Laravel Horizon exposed | 🟠 MEDIUM |
 | `NOVA_EXPOSED` | Laravel Nova exposed | 🔴 HIGH |
+| `CSRF_PROTECTION` | CSRF protection missing | 🔴 HIGH |
+| `SESSION_SECURITY` | Session security configuration | 🟠 MEDIUM |
+| `RATE_LIMITING` | Rate limiting missing | 🟠 MEDIUM |
+| `HTTP_METHODS` | Dangerous HTTP methods enabled | 🟠 MEDIUM |
+| `COMPOSER_CVE` | Composer.lock CVE scan | 🔴 CRITICAL |
 
 ## 📁 Project Structure
 
@@ -30,7 +35,8 @@ laravel-security-scanner/
 │   │   └── scan.py            # ScanTarget, Finding, ScanResult models
 │   ├── services/
 │   │   ├── scanner.py         # ScannerService — async orchestrator
-│   │   ├── reporter.py        # Console / JSON / TXT / HTML report generator
+│   │   ├── reporter.py        # Console / JSON / TXT / HTML / SARIF report generator
+│   │   ├── rate_limiter.py    # RateLimiter & RetryableClient
 │   │   └── checks/
 │   │       ├── base.py        # BaseCheck abstract class
 │   │       ├── __init__.py    # Check registry (ALL_CHECKS)
@@ -44,7 +50,12 @@ laravel-security-scanner/
 │   │       ├── debugbar_exposed.py
 │   │       ├── mix_manifest_exposed.py
 │   │       ├── horizon_exposed.py
-│   │       └── nova_exposed.py
+│   │       ├── nova_exposed.py
+│   │       ├── csrf_protection.py
+│   │       ├── session_security.py
+│   │       ├── rate_limiting.py
+│   │       ├── http_methods.py
+│   │       └── composer_lock_cve.py
 │   └── utils/
 │       └── url.py             # URL normalisation
 ├── tests/
@@ -55,15 +66,25 @@ laravel-security-scanner/
 │       ├── test_laravel_version.py
 │       ├── test_telescope_exposed.py
 │       ├── test_debugbar_exposed.py
-│       └── test_mix_manifest_exposed.py
+│       ├── test_mix_manifest_exposed.py
+│       ├── test_horizon_exposed.py
+│       ├── test_nova_exposed.py
+│       ├── test_csrf_protection.py
+│       ├── test_session_security.py
+│       ├── test_rate_limiting.py
+│       ├── test_http_methods.py
+│       └── test_composer_lock_cve.py
 ├── .github/
 │   └── workflows/
 │       └── ci.yml               # GitHub Actions CI/CD
 ├── logs/
 ├── reports/
+├── cve_database.json            # CVE database for composer scan
 ├── .env.example
 ├── requirements.txt
 ├── pytest.ini
+├── CHANGELOG.md
+├── VERSION
 └── main.py
 ```
 
@@ -71,7 +92,7 @@ laravel-security-scanner/
 
 ```bash
 # 1. Clone / download
-git clone https://github.com/AlgoItDev/Laravel-Security--Scanner.git
+git clone https://github.com/AlgoDev/Laravel-Security-Scanner.git
 cd laravel-security-scanner
 
 # 2. Create virtualenv
@@ -109,19 +130,23 @@ python main.py https://staging.app.com --no-ssl-verify
 
 # Set custom timeout
 python main.py https://app.com --timeout 20
+
+# Run specific checks only
+python main.py https://app.com --checks ENV_EXPOSED,DEBUG_MODE,COMPOSER_CVE
 ```
 
 ## 🎯 Features
 
 - **Multiple Output Formats**: Console, JSON, TXT, HTML, and SARIF reports
 - **Progress Bar**: Real-time progress tracking with rich library during scans
-- **CI/CD Integration**: GitHub Actions workflow included (`.github/workflows/ci.yml`) (Passive)
+- **CI/CD Integration**: GitHub Actions workflow included (`.github/workflows/ci.yml`)
 - **Async Scanning**: Concurrent checks for faster results
-- **Comprehensive Checks**: 10 security checks covering critical Laravel vulnerabilities
+- **Comprehensive Checks**: 16 security checks covering critical Laravel vulnerabilities
 - **SARIF Support**: SARIF format output for GitHub Security tab integration
 - **Rate Limiting**: Built-in rate limiter to avoid overwhelming target servers
 - **Retry Mechanism**: Automatic retry for failed requests with exponential backoff
 - **Connection Pooling**: HTTP connection reuse for better performance
+- **Check Selection**: Use `--checks` to run specific checks only
 
 ## 🧪 Running Tests
 
@@ -129,6 +154,8 @@ python main.py https://app.com --timeout 20
 pytest tests/unit/ -v
 pytest tests/ -v --tb=short   # all tests
 ```
+
+**Current Test Coverage**: 51 tests passing ✅
 
 ## ➕ Adding a New Check
 
@@ -146,3 +173,18 @@ That's it — the `ScannerService` picks it up automatically.
 | `1` | One or more vulnerabilities found |
 
 Useful for CI/CD pipelines: `python main.py https://app.com || echo "Security issues found!"`
+
+## 📋 Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
+
+## 📌 Version
+
+Current version: **v1.1.0** (see [VERSION](VERSION) file)
+
+---
+
+**🎯 Total Security Checks**: 16  
+**📊 Output Formats**: 5 (Console, JSON, TXT, HTML, SARIF)  
+**🧪 Tests**: 51 passing  
+**🚀 CI/CD**: GitHub Actions ready

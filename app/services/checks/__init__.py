@@ -17,6 +17,7 @@ from app.services.checks.csrf_protection import CSRFProtectionCheck
 from app.services.checks.session_security import SessionSecurityCheck
 from app.services.checks.rate_limiting import RateLimitingCheck
 from app.services.checks.http_methods import HTTPMethodsCheck
+from app.services.checks.composer_lock_cve import ComposerLockCVEScanCheck
 from app.services.checks.base import BaseCheck
 
 
@@ -37,6 +38,7 @@ ALL_CHECKS: list[type[BaseCheck]] = [
     SessionSecurityCheck,
     RateLimitingCheck,
     HTTPMethodsCheck,
+    ComposerLockCVEScanCheck,
 ]
 
 __all__ = ["ALL_CHECKS", "BaseCheck"]

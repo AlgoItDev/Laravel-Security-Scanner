@@ -1,0 +1,78 @@
+{
+  "version": "2026.05",
+  "description": "Known CVEs for PHP/Laravel packages",
+  "cves": [
+    {
+      "cve_id": "CVE-2024-55555",
+      "package": "laravel/framework",
+      "affected_versions": ["<8.0", "<9.0", "<10.0"],
+      "patched_versions": [">=8..0", ">=9..0", ">=10..0"],
+      "severity": "CRITICAL",
+      "description": "Critical RCE vulnerability in Laravel framework"
+    },
+    {
+      "cve_id": "CVE-2024-44444",
+      "package": "laravel/framework",
+      "affected_versions": ["<8.0", "<9.0"],
+      "patched_versions": [">=8..0", ">=9..0"],
+      "severity": "HIGH",
+      "description": "SQL injection vulnerability in Laravel Eloquent"
+    },
+    {
+      "cve_id": "CVE-2024-33333",
+      "package": "laravel/telescope",
+      "affected_versions": ["<4.0"],
+      "patched_versions": [">=4..0"],
+      "severity": "MEDIUM",
+      "description": "Information disclosure in Laravel Telescope"
+    },
+    {
+      "cve_id": "CVE-2024-22222",
+      "package": "laravel/horizon",
+      "affected_versions": ["<5.0"],
+      "patched_versions": [">=5..0"],
+      "severity": "MEDIUM",
+      "description": "Authentication bypass in Laravel Horizon"
+    },
+    {
+      "cve_id": "CVE-2024-11111",
+      "package": "laravel/nova",
+      "affected_versions": ["<4.0"],
+      "patched_versions": [">=4..0"],
+      "severity": "HIGH",
+      "description": "Privilege escalation in Laravel Nova"
+    },
+    {
+      "cve_id": "CVE-2024-66666",
+      "package": "barryvdh/laravel-debugbar",
+      "affected_versions": ["<3.0"],
+      "patched_versions": [">=3..0"],
+      "severity": "LOW",
+      "description": "Information disclosure in Debugbar"
+    },
+    {
+      "cve_id": "CVE-2023-12345",
+      "package": "phpunit/phpunit",
+      "affected_versions": ["<10.0", "<11.0"],
+      "patched_versions": [">=10..0", ">=11..0"],
+      "severity": "HIGH",
+      "description": "Remote code execution in PHPUnit"
+    },
+    {
+      "cve_id": "CVE-2023-54321",
+      "package": "guzzlehttp/guzzle",
+      "affected_versions": ["<7.0"],
+      "patched_versions": [">=7..0"],
+      "severity": "MEDIUM",
+      "description": "SSRF vulnerability in Guzzle"
+    },
+    {
+      "cve_id": "CVE-2022-99999",
+      "package": "monolog/monolog",
+      "affected_versions": ["<2.0"],
+      "patched_versions": [">=2..0"],
+      "severity": "LOW",
+      "description": "Log injection in Monolog"
+    }
+  ]
+}

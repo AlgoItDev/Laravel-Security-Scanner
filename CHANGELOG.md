@@ -5,10 +5,15 @@ All notable changes to the Laravel Security Scanner project will be documented i
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2026-05-06
+## [Unreleased]
 
 ### Added
-- **6 New Security Checks**:
+- Nothing unreleased yet.
+
+## [1.1.0] - 2026-05-06
+
+### Added
+- **11 New Security Checks**:
   - `LaravelVersionCheck` - Detects Laravel version disclosure (MEDIUM)
   - `TelescopeExposedCheck` - Detects Laravel Telescope exposure (HIGH)
   - `DebugbarExposedCheck` - Detects Laravel Debugbar exposure (MEDIUM)
@@ -19,8 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `SessionSecurityCheck` - Checks session security config (MEDIUM)
   - `RateLimitingCheck` - Checks rate limiting (MEDIUM)
   - `HTTPMethodsCheck` - Checks dangerous HTTP methods (MEDIUM)
+  - `ComposerLockCVEScanCheck` - Scans composer.lock for CVEs (CRITICAL)
 
-- **4 Report Formats**:
+- **5 Report Formats**:
   - Console (coloured terminal output)
   - JSON (structured data)
   - TXT (plain text)
@@ -28,9 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - SARIF (for GitHub Security tab integration)
 
 - **Performance Improvements**:
-  - Rate limiting with `RateLimiter` class (token bucket algorithm)
+  - Rate Limiting with `RateLimiter` class (token bucket algorithm)
   - Retry mechanism with `RetryableClient` (exponential backoff)
-  - Connection pooling with httpx.Limits
+  - Connection Pooling with httpx.Limits
   - Concurrent checks with asyncio
   - Progress bar with `rich` library
 
@@ -46,12 +52,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Progress bar during scans
   - Coloured console output
 
-- **Code Quality**:
-  - Fixed `datetime.utcnow()` deprecation warnings
-  - Fixed Unicode encoding issues in console output
-  - Fixed em-dash character issues
-  - All 51 tests passing
-
 - **Documentation**:
   - Updated README.md with new checks and features
   - Added project structure documentation
@@ -66,7 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `ReportService` to support:
   - HTML report generation
   - SARIF format for GitHub Security tab
-  
+
 - Updated `BaseCheck` to remove unnecessary retry code (now handled by `RetryableClient`)
 
 ### Fixed
@@ -76,11 +76,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Test coverage: 51 tests passing
 
 ### Security
-- Added 6 new security checks for comprehensive Laravel security auditing
+- Added 11 new security checks for comprehensive Laravel security auditing
 - Added rate limiting to prevent overwhelming target servers
 - Added retry mechanism with exponential backoff
 
-## [0.1.0] - 2026-04-23 (Initial Release)
+## [1.0.0] - 2026-04-23 (Initial Release)
 
 ### Added
 - Initial release with 5 security checks:
