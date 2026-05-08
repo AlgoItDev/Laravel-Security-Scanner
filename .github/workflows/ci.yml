@@ -46,6 +46,9 @@ jobs:
     name: Security Scan
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule' || github.ref == 'refs/heads/main'
+    permissions:
+      security-events: write
+      contents: read
 
     steps:
     - uses: actions/checkout@v4
@@ -55,14 +58,39 @@ jobs:
       with:
         python-version: '3.11'
 
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
     - name: Install scanner
       run: pip install -e .
 
+    - name: Verify scanner installation
+      run: |
+        which laravel-sec-scanner || echo "Scanner not found in PATH"
+        laravel-sec-scanner --version || echo "Version check failed"
+        python -m app.core.settings || true
+
     - name: Run security scan
+      id: scan
       run: |
         mkdir -p results
-        laravel-sec-scanner https://httpbin.org/html --format sarif --format json --output ./results --no-ssl-verify || echo "Scan completed"
-        ls -la results/
+        echo "Starting scan..."
+        laravel-sec-scanner https://httpbin.org/html \
+          --format sarif \
+          --format json \
+          --output ./results \
+          --no-ssl-verify
+        SCAN_EXIT=$?
+        echo "Scan exit code: $SCAN_EXIT"
+        echo "exit-code=$SCAN_EXIT" >> $GITHUB_OUTPUT
+        
+        echo "Directory contents:"
+        ls -lah results/ || echo "Results directory not found"
+        
+        echo "All JSON files:"
+        find results/ -type f -name "*.json" | head -20
 
     - name: Upload SARIF
       if: always()
@@ -70,6 +98,7 @@ jobs:
       with:
         sarif_file: results/scan_*.sarif.json
         category: laravel-security-scan
+        wait-for-processing: true
 
     - name: Upload scan results
       if: always()
@@ -77,3 +106,4 @@ jobs:
       with:
         name: security-scan-results
         path: results/
+        retention-days: 30
