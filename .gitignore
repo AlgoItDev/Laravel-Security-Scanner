@@ -36,3 +36,4 @@ ENV/
 .eggs/
 *.egg
 .pytest_cache/
+1.2.0

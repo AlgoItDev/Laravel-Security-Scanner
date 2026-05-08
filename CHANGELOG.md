@@ -5,6 +5,56 @@ All notable changes to the Laravel Security Scanner project will be documented i
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-05-08
+
+### Added
+- **PHP AST Parser (phply)** - True static code analysis:
+  - Uses phply (pure Python PHP parser) - no PHP runtime required
+  - Parses PHP code into Abstract Syntax Tree
+  - Analyzes code structure, NOT just regex patterns
+
+- **`PHPASTAnalyzer`** - Advanced AST-based analyzer:
+  - **Taint Tracking**: Tracks data flow from source to sink
+    - `$_GET['id']` → $id (source becomes tainted)
+    - $query = "..." . $id (propagation)
+    - DB::select($query) (sink = VULNERABLE!)
+  - **Dangerous Function Detection**:
+    - SQL Injection: DB::select, DB::query, DB::raw
+    - Command Injection: exec, system, shell_exec
+    - Deserialization: unserialize, eval
+    - File Inclusion: include, require, file_get_contents
+  - 90-98% confidence scoring based on AST analysis
+
+- **Dependencies**:
+  - phply>=1.2.0 (pure Python PHP parser)
+
+### Changed
+- `php-parser-py` → `phply` (more reliable, no PHP required)
+- Analyzer now uses AST nodes via `__dict__` access
+
+### Technical Details
+```php
+// ANALYZED CODE:
+$id = $_GET['id'];           // SOURCE: $id = TAINTED
+$query = "SELECT * FROM users WHERE id = " . $id;  // PROPAGATION: $query = TAINTED
+DB::select($query);         // SINK: VULNERABLE!
+
+// RESULT:
+// AST tracks: input source → variable → flow → sink
+// Confidence: 90%
+```
+
+### False Positive Examples (v1.5.0)
+| Code Pattern | Analysis | Result |
+|-------------|----------|--------|
+| `DB::select("SELECT * " . $input)` | Taint flow detected | VULNERABLE ✓ |
+| `DB::select("SELECT * ?", [$input])` | No concat, parameterized | SAFE ✓ |
+| `DB::table('users')->where('id', $id)` | ORM use, safe | SAFE ✓ |
+
+### Fixed
+- Syntax errors in phply integration
+- Lexer import issue resolved
+
 ## [1.4.0] - 2026-05-08
 
 ### Added

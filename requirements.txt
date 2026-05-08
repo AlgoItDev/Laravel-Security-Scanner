@@ -5,6 +5,9 @@ pydantic-settings>=2.3.0
 loguru>=0.7.2
 rich>=13.0.0
 
+# PHP AST parsing (using phply - pure Python parser)
+phply>=1.2.0
+
 # Version parsing for semver
 packaging>=24.0
 
