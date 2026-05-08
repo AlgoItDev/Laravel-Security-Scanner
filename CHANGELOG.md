@@ -5,6 +5,54 @@ All notable changes to the Laravel Security Scanner project will be documented i
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-05-08
+
+### Added
+- **Hybrid Static + Dynamic Scanning** for reduced false positives:
+  - `SourceFetcher` - Auto-detect and fetch Laravel source code:
+    - Web-accessible files (routes, config, controllers)
+    - GitHub repository auto-detection from target URL
+  - `StaticCodeAnalyzer` - Analyze Laravel code patterns:
+    - SQL injection pattern detection (concatenation, bindings)
+    - XSS pattern detection (Blade raw output, unescaped echo)
+    - Confidence scoring based on code patterns
+
+- **`SQL_INJECTION`** check (replaces `SQL_INJECTION_BLIND`):
+  - Hybrid approach: static + dynamic analysis
+  - DANGER patterns: `DB::select("..." . $input)`
+  - SAFE patterns: `DB::select("...", [$input])` (parameterized)
+  - Confidence threshold: 60% for vulnerability reporting
+  - False positive reduction for safe queries
+
+- **`XSS`** check (replaces `XSS_REFLECTED`):
+  - Hybrid approach: static + dynamic analysis
+  - DANGER patterns: `{!! $var !!}` (Blade raw)
+  - SAFE patterns: `{{ $var }}` (Blade auto-escaped)
+  - Confidence threshold: 50% for vulnerability reporting
+
+- **2 new unit tests** for hybrid checks
+
+### Changed
+- `SQL_INJECTION_BLIND` → `SQL_INJECTION` (hybrid)
+- `XSS_REFLECTED` → `XSS` (hybrid)
+- Updated `ALL_CHECKS` with new hybrid checks
+- Total security checks: 22 (unchanged)
+
+- **False Positive Reduction Logic**:
+  ```
+  DB::select("SELECT * FROM users")
+  → Before: VULNERABLE (SQL error detected)
+  → After: SAFE (no concatenation, no user input in code)
+  
+  DB::select("SELECT * " . $request->input('id'))
+  → Before: VULNERABLE
+  → After: VULNERABLE (static confirms + dynamic verifies)
+  ```
+
+### Fixed
+- Syntax errors in `static_analyzer.py` (regex escaping)
+- Added missing confidence tuple values in XSS patterns
+
 ## [1.3.0] - 2026-05-08
 
 ### Added

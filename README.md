@@ -22,10 +22,10 @@ Production-grade Python CLI tool for auditing Laravel web applications for commo
 | `RATE_LIMITING` | Rate limiting missing | MEDIUM |
 | `HTTP_METHODS` | Dangerous HTTP methods enabled | MEDIUM |
 | `COMPOSER_CVE` | Composer.lock CVE scan (OSV API + local DB) | CRITICAL |
-| `SQL_INJECTION_BLIND` | Blind SQL injection vulnerability | CRITICAL |
-| `XSS_REFLECTED` | Reflected XSS vulnerability | HIGH |
+| `SQL_INJECTION` | SQL Injection vulnerability (Hybrid) | CRITICAL |
+| `XSS` | Cross-Site Scripting (Hybrid) | HIGH |
 
-> **Note**: `SQL_INJECTION_BLIND` and `XSS_REFLECTED` checks are lightweight passive probes, not full exploitation scanners. For comprehensive testing, combine with tools like SQLMap or Burp Suite.
+> **Note**: `SQL_INJECTION` and `XSS` use hybrid static + dynamic analysis to reduce false positives. For comprehensive testing, combine with tools like SQLMap or Burp Suite.
 | `JWT_ANALYSIS` | JWT token security issues | HIGH |
 | `CORS_MISCONFIG` | CORS misconfiguration | MEDIUM |
 | `OPEN_REDIRECT` | Open redirect vulnerability | MEDIUM |
@@ -63,7 +63,9 @@ laravel-security-scanner/
 │   │       ├── session_security.py
 │   │       ├── rate_limiting.py
 │   │       ├── http_methods.py
-│   │       └── composer_lock_cve.py
+│   │       ├── composer_lock_cve.py
+│   │       ├── sql_injection.py    # Hybrid (static + dynamic)
+│   │       └── xss.py             # Hybrid (static + dynamic)
 │   └── utils/
 │       └── url.py             # URL normalisation
 ├── tests/
@@ -184,7 +186,38 @@ pytest tests/unit/ -v
 pytest tests/ -v --tb=short   # all tests
 ```
 
-**Current Test Coverage**: 100 tests passing
+**Current Test Coverage**: 102 tests passing
+
+## False Positive Reduction
+
+This tool uses **hybrid static + dynamic analysis** to minimize false positives:
+
+### How It Works
+
+1. **Static Analysis**: Fetches source code from:
+   - Web-accessible files (routes, config, controllers)
+   - GitHub repository (auto-detected from target URL)
+   - Analyzes code patterns for dangerous usage
+
+2. **Dynamic Probing**: Tests endpoints with payloads:
+   - SQL injection payloads for SQL injection check
+   - XSS payloads for XSS check
+   - Analyzes application responses
+
+3. **Confidence Scoring**: Combines results:
+   - Static DANGER + Dynamic VULN = **95%** confidence
+   - Static DANGER = **60%** confidence
+   - Dynamic VULN only = **40%** confidence (WAF bypass possible)
+   - No findings = **SAFE**
+
+### False Positive Examples
+
+| Code Pattern | Old Behavior | New Behavior |
+|--------------|-------------|--------------|
+| `DB::select("SELECT * FROM users")` | VULNERABLE (SQL error) | SAFE (no concat, no input) |
+| `DB::select("SELECT * " . $input)` | VULNERABLE | VULNERABLE (confirmed) |
+| `{{ $var }}` (Blade) | VULNERABLE | SAFE (auto-escaped) |
+| `{!! $var !!}` (Blade raw) | VULNERABLE | VULNERABLE (raw output) |
 
 ## Adding a New Check
 
@@ -209,11 +242,11 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
 ## Version
 
-Current version: **v1.3.0** (see [VERSION](VERSION) file)
+Current version: **v1.4.0** (see [VERSION](VERSION) file)
 
 ---
 
 **Total Security Checks**: 22
 **Output Formats**: 5 (Console, JSON, TXT, HTML, SARIF)
-**Tests**: 100 passing
+**Tests**: 102 passing
 **CI/CD**: GitHub Actions ready

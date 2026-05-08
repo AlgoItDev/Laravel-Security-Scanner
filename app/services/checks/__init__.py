@@ -18,8 +18,8 @@ from app.services.checks.session_security import SessionSecurityCheck
 from app.services.checks.rate_limiting import RateLimitingCheck
 from app.services.checks.http_methods import HTTPMethodsCheck
 from app.services.checks.composer_lock_cve import ComposerLockCVEScanCheck
-from app.services.checks.sql_injection_blind import SQLInjectionBlindCheck
-from app.services.checks.xss_reflected import XSSReflectedCheck
+from app.services.checks.sql_injection import SQLInjectionCheck
+from app.services.checks.xss import XSSCheck
 from app.services.checks.jwt_analysis import JWTAnalysisCheck
 from app.services.checks.cors_misconfig import CORSMisconfigCheck
 from app.services.checks.open_redirect import OpenRedirectCheck
@@ -45,8 +45,8 @@ ALL_CHECKS: list[type[BaseCheck]] = [
     RateLimitingCheck,
     HTTPMethodsCheck,
     ComposerLockCVEScanCheck,
-    SQLInjectionBlindCheck,
-    XSSReflectedCheck,
+    SQLInjectionCheck,
+    XSSCheck,
     JWTAnalysisCheck,
     CORSMisconfigCheck,
     OpenRedirectCheck,
