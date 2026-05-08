@@ -81,13 +81,21 @@ jobs:
         echo "=== All generated files ==="
         find results/ -type f 2>/dev/null || echo "No files found"
 
+    - name: Upload SARIF directly
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: sarif-reports
+        path: results/*.sarif.json
+        if-no-files-found: warn
+          
     - name: Upload SARIF to GitHub Security
       if: always()
+      continue-on-error: true
       uses: github/codeql-action/upload-sarif@v4
       with:
-         sarif_file: results/*.sarif.json
-         category: laravel-security-scan
-         wait-for-processing: true
+        sarif_file: results/*.sarif.json
+        category: laravel-security-scan
 
     - name: Upload results
       if: always()
