@@ -66,8 +66,7 @@ jobs:
         mkdir -p results
         echo "=== Starting Scanner ==="
         python main.py https://httpbin.org/html \
-          --format sarif \
-          --format json \
+          --format all \
           --output ./results \
           --no-ssl-verify
         EXIT_CODE=$?
@@ -76,7 +75,7 @@ jobs:
         
         echo ""
         echo "=== Results Directory ==="
-        ls -lah results/ || echo "Directory empty or not found"
+        ls -lah results/ || echo "Directory empty"
         
         echo ""
         echo "=== All generated files ==="
