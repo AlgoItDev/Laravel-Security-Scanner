@@ -49,11 +49,38 @@ jobs:
     - name: Install scanner
       run: pip install -e .
 
+    - name: Debug info
+      run: |
+        echo "=== Python Version ==="
+        python --version
+        echo ""
+        echo "=== Check if main.py exists ==="
+        ls -la main.py
+        echo ""
+        echo "=== Check installed packages ==="
+        pip list | grep -i laravel
+
     - name: Run scan
+      id: scan
       run: |
         mkdir -p results
-        python -m main https://httpbin.org/html --format sarif --format json --output ./results --no-ssl-verify || echo "Scan done"
-        ls -la results/
+        echo "=== Starting Scanner ==="
+        python main.py https://httpbin.org/html \
+          --format sarif \
+          --format json \
+          --output ./results \
+          --no-ssl-verify
+        EXIT_CODE=$?
+        echo "Exit code: $EXIT_CODE"
+        echo "exit-code=$EXIT_CODE" >> $GITHUB_OUTPUT
+        
+        echo ""
+        echo "=== Results Directory ==="
+        ls -lah results/ || echo "Directory empty or not found"
+        
+        echo ""
+        echo "=== All generated files ==="
+        find results/ -type f 2>/dev/null || echo "No files found"
 
     - name: Upload SARIF
       if: always()
