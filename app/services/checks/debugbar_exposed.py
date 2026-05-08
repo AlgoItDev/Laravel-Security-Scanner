@@ -100,13 +100,22 @@ class DebugbarExposedCheck(BaseCheck):
                 ),
                 evidence="\n".join(evidence_details) if evidence_details else "Debugbar detected",
                 remediation=(
-                    "1. Disable Debugbar in production:\n"
-                    "   - Set `DEBUGBAR_ENABLED=false` in .env\n"
-                    "   - Or use: `config('debugbar.enabled') = false`\n"
-                    "2. Remove Debugbar package from production:\n"
-                    "   `composer remove barryvdh/laravel-debugbar --dev`\n"
-                    "3. Ensure Debugbar is only loaded in development:\n"
-                    "   Check `config/debugbar.php` and service provider conditions."
+                    r"⚠️ MEDIUM: Debugbar enabled! Query log, memory usage herkes görür!" + "\n\n"
+                    r"🛡️ Seçenek 1: ENV ile Kapat:" + "\n"
+                    "   # .env:\n"
+                    "   DEBUGBAR_ENABLED=false\n\n"
+                    r"🛡️ Seçenek 2: Service Provider:" + "\n"
+                    "   # app/Providers/AppServiceProvider.php:\n"
+                    r"   public function register() {" + "\n"
+                    r"       if ($this->app->environment('local')) {" + "\n"
+                    r"           $this->app->register(\Debugbar::class);" + "\n"
+                    "       }\n"
+                    "   }\n\n"
+                    "🛡️ Seçenek 3: config/debugbar.php:\n"
+                    "   'enabled' => env('DEBUGBAR_ENABLED', false),\n\n"
+                    "🛡️ Seçenek 4: Kaldır:\n"
+                    "   composer remove barryvdh/laravel-debugbar --dev\n\n"
+                    "🔗 Ref: https://github.com/barryvdh/laravel-debugbar"
                 ),
                 cvss_score=5.3,
                 references=[

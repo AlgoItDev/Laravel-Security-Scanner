@@ -91,11 +91,25 @@ class CORSMisconfigCheck(BaseCheck):
                 ),
                 evidence="\n".join(evidence_details),
                 remediation=(
-                    "1. Never set Access-Control-Allow-Origin to * with credentials.\n"
-                    "2. Use specific allowed origins instead of wildcards.\n"
-                    "3. Implement origin whitelist validation in application code.\n"
-                    "4. Restrict Access-Control-Allow-Methods to only necessary methods.\n"
-                    "5. Use SameSite cookies as additional protection layer."
+                    "⚠️ MEDIUM: CORS misconfiguration! Cross-origin attack riski!\n\n"
+                    "🛡️ 1. Wildcard YASAK (*):\n"
+                    "   # ❌ Yanlış:\n"
+                    "   'allowed_origins' => ['*'],  # credentials ile!\n\n"
+                    "   # ✅ Doğru:\n"
+                    "   'allowed_origins' => ['https://app.example.com'],\n\n"
+                    "🛡️ 2. Credential ile:\n"
+                    "   # credentials varsa * çalışmaz, spesifik domain şart\n"
+                    "   'supports_credentials' => true ise:\n"
+                    "       'allowed_origins' => ['https://example.com'],\n\n"
+                    "🛡️ 3. Methods kısıtla:\n"
+                    "   'allowed_methods' => ['GET', 'POST'],\n\n"
+                    "🛡️ 4. Laravel config:\n"
+                    "   # config/cors.php:\n"
+                    "   'paths' => ['api/*'],\n"
+                    "   'allowed_methods' => ['GET', 'POST'],\n\n"
+                    "🛡️ 5. SameSite Cookie:\n"
+                    "   'samesite' => 'Strict',  # CSRF ek koruma\n\n"
+                    "🔗 Ref: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS"
                 ),
                 cvss_score=5.5,
                 references=[

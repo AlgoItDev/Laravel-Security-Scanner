@@ -105,11 +105,26 @@ class JWTAnalysisCheck(BaseCheck):
                 ),
                 evidence="\n".join(evidence_details[:5]),
                 remediation=(
-                    "1. Use RS256 or ES256 algorithms instead of HS256.\n"
-                    "2. Always set 'exp' expiration claim.\n"
-                    "3. Validate 'iss' (issuer) and 'aud' (audience) claims.\n"
-                    "4. Implement token blacklisting for logout.\n"
-                    "5. Store signing keys securely in environment variables."
+                    "⚠️ HIGH: JWT güvenlik açıkları! Authentication bypass!\n\n"
+                    "🛡️ 1. Algoritma (EN ÖNEMLİ):\n"
+                    "   # ❌ KULLANMA:\n"
+                    "   'HS256'  # Symmetric - secret sızdırılabilir\n\n"
+                    "   # ✅ KULLAN:\n"
+                    "   'RS256'  # Asymmetric - private key gizli\n"
+                    "   'ES256'  # ECDSA - daha kısa\n\n"
+                    "🛡️ 2. Expiration (exp):\n"
+                    "   # Her token'a exp ekle:\n"
+                    "   jwt.sign({ user_id }, secret, { expiresIn: '1h' });\n\n"
+                    "🛡️ 3. Issuer/Audience doğrula:\n"
+                    "   # payload:\n"
+                    "   { iss: 'https://api.example.com', aud: 'myapp' }\n\n"
+                    "🛡️ 4. Blacklist ( logout):\n"
+                    "   # Redis'e token ID'si kaydet\n"
+                    "   Redis::sadd('blacklist', tokenId);\n\n"
+                    "🛡️ 5. Key storage:\n"
+                    "   # .env (ASLA git'e commitlenmesin!)\n"
+                    "   JWT_PRIVATE_KEY=./keys/private.pem\n\n"
+                    "🔗 Ref: https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/"
                 ),
                 cvss_score=7.0,
                 references=[

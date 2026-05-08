@@ -51,10 +51,21 @@ class MixManifestExposedCheck(BaseCheck):
                         ),
                         evidence=f"URL: {url}\nResponse: {body[:200]}...",
                         remediation=(
-                            "1. Block access to mix-manifest.json in your web server config:\n"
-                            "   Nginx: `location = /mix-manifest.json { deny all; }`\n"
-                            "   Apache: `<Files \"mix-manifest.json\"> Deny from all </Files>`\n"
-                            "2. Or configure Laravel to not generate the manifest in production."
+                            "ℹ️ LOW: mix-manifest.json public! Path bilgileri sızdırılabilir.\n\n"
+                            "🛡️ Seçenek 1: Nginx ile Engelle:\n"
+                            "   location = /mix-manifest.json {\n"
+                            "       deny all;\n"
+                            "       return 404;\n"
+                            "   }\n\n"
+                            "🛡️ Seçenek 2: Apache:\n"
+                            "   <Files \"mix-manifest.json\">\n"
+                            "       Order deny,allow\n"
+                            "       Deny from all\n"
+                            "   </Files>\n\n"
+                            "🛡️ Seçenek 3: Vite (modern):\n"
+                            "   # Vite kullanıyorsan bu sorun olmaz\n"
+                            "   # mix-manifest.json yerine .vite manifest kullan\n"
+                            "🔗 Ref: https://laravel.com/docs/mix"
                         ),
                         cvss_score=2.0,
                         references=[

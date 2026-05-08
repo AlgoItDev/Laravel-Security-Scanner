@@ -101,14 +101,26 @@ class OpenRedirectCheck(BaseCheck):
                     f"Open redirect vulnerabilities found in {len(vulnerabilities)} parameter(s). "
                     "Attackers can exploit these to redirect users to malicious sites for phishing."
                 ),
-                evidence="\n".join(evidence_details[:5]),
-                remediation=(
-                    "1. Implement allowlist-based URL validation.\n"
-                    "2. Avoid using user input directly in redirect URLs.\n"
-                    "3. Use path normalization to detect traversal attempts.\n"
-                    "4. Implement URL shortener with internal mappings.\n"
-                    "5. Add Content-Security-Policy with 'frame-ancestors' directive."
-                ),
+evidence="\n".join(evidence_details[:5]),
+            remediation=(
+                "⚠️ MEDIUM: Open Redirect - Kullanıcı phishing'e yönlendirilebilir!\n\n"
+                "🛡️ 1. Allowlist validation (EN İYİ):\n"
+                "   $allowed = ['/dashboard', '/profile', '/settings'];\n"
+                "   if (!in_array($redirect, $allowed)) {\n"
+                "       $redirect = '/dashboard';\n"
+                "   }\n\n"
+                "📝 2. Domain kontrolü:\n"
+                "   $host = parse_url($url, PHP_URL_HOST);\n"
+                "   if ($host && $host !== request()->getHost()) {\n"
+                "       abort(403);  // External domain!\n"
+                "   }\n\n"
+                "🛡️ 3. Internal redirect only:\n"
+                "   return redirect()->to($validatedPath);\n\n"
+                "🔒 4. CSP frame-ancestors:\n"
+                "   # Phishing iframe engelle\n"
+                "   'Content-Security-Policy' => \"frame-ancestors 'self'\",\n\n"
+                "🔗 Ref: https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html"
+            ),
                 cvss_score=6.0,
                 references=[
                     "https://owasp.org/www-community/attacks/Open_redirect",

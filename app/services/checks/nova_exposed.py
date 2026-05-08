@@ -75,13 +75,25 @@ class NovaExposedCheck(BaseCheck):
                 ),
                 evidence="\n".join(evidence_details) if evidence_details else "Nova detected",
                 remediation=(
-                    "1. Remove Nova package from production: "
-                    "`composer remove laravel/nova`\n"
-                    "2. Or ensure Nova is only enabled in non-production environments:\n"
-                    "   Check `app/Providers/NovaServiceProvider.php` and ensure it's wrapped in environment check\n"
-                    "3. Configure web server to deny access to /nova path.\n"
-                    "4. Use Nova's built-in authentication: "
-                    "`Nova::auth(function ($request) { return $request->user()->isAdmin(); });`"
+                    "⚠️ HIGH: Laravel Nova public! Tüm admin paneline erişim!\n\n"
+                    "🛡️ Seçenek 1: Production'dan Kaldır:\n"
+                    "   composer remove laravel/nova\n\n"
+                    "🛡️ Seçenek 2: Route kısıtı:\n"
+                    "   # routes/nova.php:\n"
+                    "   Route::domain(config('nova.domain'))\n"
+                    "       ->middleware(['web', 'auth', 'can:nova.admin'])\n"
+                    "       ->group(base_path('routes/nova.php'));\n\n"
+                    "🛡️ Seçenek 3: Nginx ile Engelle:\n"
+                    "   location /nova {\n"
+                    "       allow 192.168.1.0/24;  # IP whitelist\n"
+                    "       deny all;\n"
+                    "   }\n\n"
+                    "🛡️ Seçenek 4: Gate kontrolü:\n"
+                    "   # app/Providers/NovaServiceProvider.php:\n"
+                    "   Nova::auth(function ($request) {\n"
+                    "       return $request->user()->isAdmin();\n"
+                    "   });\n\n"
+                    "🔗 Ref: https://nova.laravel.com/docs"
                 ),
                 cvss_score=7.5,
                 references=[

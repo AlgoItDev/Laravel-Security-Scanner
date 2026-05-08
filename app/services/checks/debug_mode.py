@@ -89,10 +89,21 @@ class DebugModeCheck(BaseCheck):
                 ),
                 evidence="\n".join(evidence_parts),
                 remediation=(
-                    "1. Set APP_DEBUG=false in your production .env.\n"
-                    "2. Set APP_ENV=production.\n"
-                    "3. Verify with: `php artisan config:cache` after changing .env.\n"
-                    "4. Consider a custom exception handler that renders safe error pages."
+                    "🔴 CRITICAL: APP_DEBUG=true stack trace'ları saldırgana gösterir\n\n"
+                    "📁 1. Düzeltme (.env):\n"
+                    "   APP_DEBUG=false\n"
+                    "   APP_ENV=production\n\n"
+                    "⚡ 2. Cache temizle:\n"
+                    "   php artisan config:clear\n"
+                    "   # veya: php artisan config:cache (production'da)\n\n"
+                    "🧪 3. Test:\n"
+                    "   # Stack trace YOK, safe error sayfası OLMALI\n"
+                    "   curl -I https://site.test/not-found\n\n"
+                    "📚 4. İleri Adımlar:\n"
+                    "   - Custom error handler: app/Exceptions/Handler.php\n"
+                    "   - views/errors/ dizini oluştur\n"
+                    "   - Log viewer: Laravel Forge / Envoyer kullan\n\n"
+                    "🔗 Ref: https://laravel.com/docs/configuration#debug-mode"
                 ),
                 cvss_score=7.5,
                 references=[

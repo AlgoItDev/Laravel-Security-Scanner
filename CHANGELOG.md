@@ -5,6 +5,36 @@ All notable changes to the Laravel Security Scanner project will be documented i
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-05-08
+
+### Enhanced
+- **AI-Powered Fix Suggestions** (all remediation enhanced):
+  - Detailed step-by-step instructions for each vulnerability
+  - Laravel code examples (✅ Doğru / ❌ Yanlış patterns)
+  - Nginx, Apache, .htaccess configuration examples
+  - CLI commands for verification
+  - Multiple solution options per vulnerability
+  - Emoji-based severity indicators: 🚨⚠️ℹ️
+  - References to official documentation
+
+- **Enhanced Checks**:
+  - debug_mode.py: APP_DEBUG=false, cache commands, test steps
+  - env_exposed.py: Credential rotation, Nginx/Apache configs
+  - sql_injection.py: Parameterized queries, WAF integration
+  - xss.py: Blade syntax, CSP headers, cookie middleware
+  - open_redirect.py: Allowlist validation, domain kontrolü
+  - security_headers.py: Middleware, Nginx, .htaccess examples
+  - telescope/horizon/nova/debugbar: 4 farklı çözüm
+  - session_security.py: Redis config, cookie settings
+  - jwt_analysis.py: RS256, exp, blacklist patterns
+  - rate_limiting.py: Laravel + Nginx rate limiting
+  - cors_misconfig.py: Origin whitelist, credentials
+
+### Fixed
+- HTML report JavaScript syntax error (unescaped braces)
+- Severity count properties in reporter.py
+- Missing import (RiskLevel)
+
 ## [1.5.0] - 2026-05-08
 
 ### Added

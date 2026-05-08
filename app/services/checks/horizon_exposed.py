@@ -74,14 +74,27 @@ class HorizonExposedCheck(BaseCheck):
                 ),
                 evidence=f"Exposed paths: {', '.join(exposed_paths)}",
                 remediation=(
-                    "1. Remove Horizon package from production: "
-                    "`composer remove laravel/horizon`\n"
-                    "2. Or ensure Horizon is only enabled in non-production environments:\n"
-                    "   In `app/Providers/HorizonServiceProvider.php`, wrap in environment check:\n"
-                    "   `if ($this->app->environment('local', 'staging')) { $this->register(); }`\n"
-                    "3. Configure web server to deny access to /horizon path.\n"
-                    "4. Use Horizon's built-in authentication: "
-                    "`Horizon::auth(function ($request) { return $request->user() && $request->user()->isAdmin(); });`"
+                    "⚠️ MEDIUM: Horizon public! Queue dashboard herkes açık!\n\n"
+                    "🛡️ Seçenek 1: Production'dan Kaldır:\n"
+                    "   composer remove laravel/horizon\n\n"
+                    "🛡️ Seçenek 2: Environment Kısıtı:\n"
+                    "   # app/Providers/HorizonServiceProvider.php:\n"
+                    "   public function boot() {\n"
+                    "       if (in_array($this->app->environment(), ['local', 'staging'])) {\n"
+                    "           Horizon::auth(function ($request) { return true; });\n"
+                    "       }\n"
+                    "   }\n\n"
+                    "🛡️ Seçenek 3: Nginx ile Engelle:\n"
+                    "   location /horizon {\n"
+                    "       deny all;\n"
+                    "       return 404;\n"
+                    "   }\n\n"
+                    "🛡️ Seçenek 4: Auth Koruması:\n"
+                    "   # routes/horizon.php:\n"
+                    "   Horizon::auth(function ($request) {\n"
+                    "       return $request->user() && $request->user()->isAdmin();\n"
+                    "   });\n\n"
+                    "🔗 Ref: https://laravel.com/docs/horizon"
                 ),
                 cvss_score=5.3,
                 references=[

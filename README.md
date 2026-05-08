@@ -2,6 +2,8 @@
 
 Production-grade Python CLI tool for auditing Laravel web applications for common security misconfigurations.
 
+![Preview](.github/img/preview.png)
+
 ## What It Checks
 
 | Check ID | Title | Severity |
@@ -181,6 +183,14 @@ laravel-sec-scanner https://app.com --cache-ttl 168
 - **OSV Cache**: File-based cache with configurable TTL for offline scanning
 - **Progressive Exit Codes**: 0-4 based on severity for CI/CD pipelines
 - **Fail-on Threshold**: `--fail-on critical` for GitHub Actions integration
+
+- **AI-Powered Fix Suggestions** (v1.6.0):
+  - Detailed step-by-step remediation instructions
+  - Laravel code examples (correct vs incorrect patterns)
+  - Nginx/Apache configuration examples
+  - CLI commands for verification
+  - Multiple solution options per vulnerability
+  - Emoji-based severity indicators
 
 ## Running Tests
 

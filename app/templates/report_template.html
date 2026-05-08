@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Scan Report - {target_url}</title>
+    
+    <!-- Open Graph / Twitter Card -->
+    <meta property="og:title" content="Security Scan Report - {target_url}">
+    <meta property="og:description" content="Security Score: {score}/100 - {grade}">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Security Scan Report - {target_url}">
+    <meta name="twitter:description" content="Security Score: {score}/100 - {grade}">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        :root {{
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            
+            --critical: #dc2626;
+            --critical-bg: rgba(220, 38, 38, 0.15);
+            --high: #ea580c;
+            --high-bg: rgba(234, 88, 12, 0.15);
+            --medium: #ca8a04;
+            --medium-bg: rgba(202, 138, 4, 0.15);
+            --low: #2563eb;
+            --low-bg: rgba(37, 99, 235, 0.15);
+            --info: #64748b;
+            --info-bg: rgba(100, 116, 139, 0.15);
+            --safe: #16a34a;
+            --safe-bg: rgba(22, 163, 74, 0.15);
+            
+            --border: #334155;
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }}
+        
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+        
+        body {{
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }}
+        
+        .container {{
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }}
+        
+        /* Header */
+        .header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }}
+        
+        .logo {{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }}
+        
+        .logo-icon {{
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }}
+        
+        .logo-text {{
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }}
+        
+        .header-actions {{
+            display: flex;
+            gap: 10px;
+        }}
+        
+        .btn {{
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        
+        .btn-primary {{
+            background: var(--accent);
+            color: white;
+        }}
+        
+        .btn-primary:hover {{
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }}
+        
+        .btn-secondary {{
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }}
+        
+        .btn-secondary:hover {{
+            background: var(--bg-secondary);
+        }}
+        
+        /* Hero Section */
+        .hero {{
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            border-radius: 24px;
+            padding: 50px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease;
+        }}
+        
+        .hero::before {{
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.2), transparent);
+            pointer-events: none;
+        }}
+        
+        .hero-content {{
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            position: relative;
+            z-index: 1;
+        }}
+        
+        /* Score Gauge */
+        .score-gauge {{
+            position: relative;
+            width: 200px;
+            height: 200px;
+            flex-shrink: 0;
+        }}
+        
+        .score-gauge svg {{
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }}
+        
+        .score-gauge-bg {{
+            fill: none;
+            stroke: var(--bg-card);
+            stroke-width: 12;
+        }}
+        
+        .score-gauge-fill {{
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1.5s ease;
+        }}
+        
+        .score-value {{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }}
+        
+        .score-number {{
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1;
+        }}
+        
+        .score-label {{
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }}
+        
+        /* Hero Info */
+        .hero-info {{
+            flex: 1;
+        }}
+        
+        .hero-title {{
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }}
+        
+        .hero-target {{
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            color: var(--accent);
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+            display: inline-block;
+        }}
+        
+        .hero-meta {{
+            display: flex;
+            gap: 30px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }}
+        
+        .meta-item {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        
+        /* Grade Badge */
+        .grade-badge {{
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-left: 16px;
+        }}
+        
+        .grade-A, .grade-Aplus {{
+            background: rgba(22, 163, 74, 0.2);
+            color: #4ade80;
+        }}
+        
+        .grade-B, .grade-Bplus {{
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }}
+        
+        .grade-C {{
+            background: rgba(202, 138, 4, 0.2);
+            color: #facc15;
+        }}
+        
+        .grade-D, .grade-F {{
+            background: rgba(220, 38, 38, 0.2);
+            color: #f87171;
+        }}
+        
+        /* Stats Grid */
+        .stats-grid {{
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }}
+        
+        .stat-card {{
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease;
+        }}
+        
+        .stat-card:hover {{
+            transform: translateY(-4px);
+            border-color: var(--accent);
+        }}
+        
+        .stat-value {{
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }}
+        
+        .stat-label {{
+            font-size: 14px;
+            color: var(--text-secondary);
+        }}
+        
+        .stat-critical .stat-value {{ color: var(--critical); }}
+        .stat-high .stat-value {{ color: var(--high); }}
+        .stat-medium .stat-value {{ color: var(--medium); }}
+        .stat-low .stat-value {{ color: var(--low); }}
+        
+        /* Categories Section */
+        .section {{
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease;
+        }}
+        
+        .section-title {{
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }}
+        
+        .section-title::before {{
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 2px;
+        }}
+        
+        .categories-grid {{
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }}
+        
+        .category-card {{
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }}
+        
+        .category-card:hover {{
+            border-color: var(--accent);
+        }}
+        
+        .category-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }}
+        
+        .category-name {{
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }}
+        
+        .category-score {{
+            font-weight: 700;
+            font-size: 18px;
+        }}
+        
+        .category-progress {{
+            height: 8px;
+            background: var(--bg-card);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }}
+        
+        .category-progress-bar {{
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }}
+        
+        .category-meta {{
+            font-size: 12px;
+            color: var(--text-muted);
+        }}
+        
+        /* Findings Section */
+        .findings-list {{
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }}
+        
+        .finding-card {{
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }}
+        
+        .finding-card:hover {{
+            border-color: var(--accent);
+            transform: translateX(4px);
+        }}
+        
+        .finding-header {{
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            cursor: pointer;
+        }}
+        
+        .severity-badge {{
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 16px;
+            min-width: 80px;
+            text-align: center;
+        }}
+        
+        .severity-critical {{
+            background: var(--critical-bg);
+            color: var(--critical);
+        }}
+        
+        .severity-high {{
+            background: var(--high-bg);
+            color: var(--high);
+        }}
+        
+        .severity-medium {{
+            background: var(--medium-bg);
+            color: var(--medium);
+        }}
+        
+        .severity-low {{
+            background: var(--low-bg);
+            color: var(--low);
+        }}
+        
+        .severity-info {{
+            background: var(--info-bg);
+            color: var(--info);
+        }}
+        
+        .finding-title {{
+            flex: 1;
+            font-weight: 600;
+        }}
+        
+        .finding-toggle {{
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+        }}
+        
+        .finding-card.expanded .finding-toggle {{
+            transform: rotate(180deg);
+        }}
+        
+        .finding-body {{
+            padding: 0 20px 20px;
+            display: none;
+        }}
+        
+        .finding-card.expanded .finding-body {{
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }}
+        
+        .finding-detail {{
+            margin-bottom: 16px;
+        }}
+        
+        .finding-detail-label {{
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }}
+        
+        .finding-detail-value {{
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            background: var(--bg-card);
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }}
+        
+        /* Chart Section */
+        .chart-container {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+        }}
+        
+        .chart-card {{
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+        }}
+        
+        .chart-title {{
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }}
+        
+        /* Executive Summary */
+        .executive-summary {{
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 40px;
+            border: 1px solid var(--border);
+        }}
+        
+        .executive-title {{
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        
+        .summary-grid {{
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }}
+        
+        .summary-item {{
+            display: flex;
+            gap: 12px;
+        }}
+        
+        .summary-icon {{
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }}
+        
+        .summary-text h4 {{
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }}
+        
+        .summary-text p {{
+            font-size: 13px;
+            color: var(--text-secondary);
+        }}
+        
+        /* Recommendations */
+        .recommendations {{
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--border);
+        }}
+        
+        .rec-grid {{
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }}
+        
+        .rec-item {{
+            display: flex;
+            gap: 16px;
+            padding: 20px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }}
+        
+        .rec-item:hover {{
+            transform: translateY(-2px);
+        }}
+        
+        .rec-number {{
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }}
+        
+        .rec-content h4 {{
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }}
+        
+        .rec-content p {{
+            font-size: 13px;
+            color: var(--text-secondary);
+        }}
+        
+        /* Footer */
+        .footer {{
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-muted);
+            font-size: 14px;
+            border-top: 1px solid var(--border);
+            margin-top: 60px;
+        }}
+        
+        /* Animations */
+        @keyframes fadeIn {{
+            from {{ opacity: 0; }}
+            to {{ opacity: 1; }}
+        }}
+        
+        @keyframes fadeInUp {{
+            from {{
+                opacity: 0;
+                transform: translateY(20px);
+            }}
+            to {{
+                opacity: 1;
+                transform: translateY(0);
+            }}
+        }}
+        
+        @keyframes pulse {{
+            0%, 100% {{ opacity: 1; }}
+            50% {{ opacity: 0.5; }}
+        }}
+        
+        /* Print Styles */
+        @media print {{
+            body {{
+                background: white;
+                color: black;
+            }}
+            
+            .btn, .header-actions {{
+                display: none;
+            }}
+            
+            .hero, .stat-card, .category-card, .finding-card {{
+                break-inside: avoid;
+            }}
+        }}
+        
+        /* Responsive */
+        @media (max-width: 768px) {{
+            .hero-content {{
+                flex-direction: column;
+                text-align: center;
+            }}
+            
+            .stats-grid {{
+                grid-template-columns: repeat(2, 1fr);
+            }}
+            
+            .categories-grid {{
+                grid-template-columns: 1fr;
+            }}
+            
+            .chart-container {{
+                grid-template-columns: 1fr;
+            }}
+            
+            .summary-grid, .rec-grid {{
+                grid-template-columns: 1fr;
+            }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">🛡️</div>
+                <span class="logo-text">Laravel Security Scanner</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="window.print()">
+                    📄 Print / PDF
+                </button>
+                <button class="btn btn-primary" onclick="shareReport()">
+                    🔗 Share
+                </button>
+            </div>
+        </header>
+        
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="score-gauge">
+                    <svg viewBox="0 0 200 200">
+                        <circle class="score-gauge-bg" cx="100" cy="100" r="85"></circle>
+                        <circle class="score-gauge-fill" cx="100" cy="100" r="85" 
+                            stroke-dasharray="534"
+                            stroke-dashoffset="{score_offset}"
+                            style="stroke: {score_color};"></circle>
+                    </svg>
+                    <div class="score-value">
+                        <div class="score-number" style="color: {score_color};">{score}</div>
+                        <div class="score-label">out of 100</div>
+                    </div>
+                </div>
+                
+                <div class="hero-info">
+                    <h1 class="hero-title">
+                        Security Scan Report
+                        <span class="grade-badge grade-{grade_lower}">{grade}</span>
+                    </h1>
+                    <div class="hero-target">{target_url}</div>
+                    <div class="hero-meta">
+                        <div class="meta-item">
+                            <span>📅</span>
+                            <span>Scanned: {scan_date}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>⏱️</span>
+                            <span>Duration: {duration}s</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>🔍</span>
+                            <span>{checks_run} checks</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{total_findings}</div>
+                <div class="stat-label">Total Findings</div>
+            </div>
+            <div class="stat-card stat-critical">
+                <div class="stat-value">{critical_count}</div>
+                <div class="stat-label">Critical</div>
+            </div>
+            <div class="stat-card stat-high">
+                <div class="stat-value">{high_count}</div>
+                <div class="stat-label">High</div>
+            </div>
+            <div class="stat-card stat-medium">
+                <div class="stat-value">{medium_count}</div>
+                <div class="stat-label">Medium</div>
+            </div>
+        </div>
+        
+        <!-- Category Breakdown -->
+        <section class="section">
+            <h2 class="section-title">Category Breakdown</h2>
+            <div class="categories-grid">
+                {category_cards}
+            </div>
+        </section>
+        
+        <!-- Charts -->
+        <div class="chart-container">
+            <div class="chart-card">
+                <h3 class="chart-title">Severity Distribution</h3>
+                <canvas id="severityChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3 class="chart-title">Risk Timeline</h3>
+                <canvas id="timelineChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Executive Summary -->
+        <section class="executive-summary">
+            <h3 class="executive-title">📊 Executive Summary</h3>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-icon" style="background: {severity_bg};">
+                        {severity_icon}
+                    </div>
+                    <div class="summary-text">
+                        <h4>Overall Risk Level: {risk_level}</h4>
+                        <p>{risk_summary}</p>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-icon" style="background: var(--accent);">
+                        🎯
+                    </div>
+                    <div class="summary-text">
+                        <h4>Primary Concerns</h4>
+                        <p>{primary_concerns}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Recommendations -->
+        <section class="recommendations">
+            <h3 class="executive-title">✅ Recommendations</h3>
+            <div class="rec-grid">
+                {recommendations}
+            </div>
+        </section>
+        
+        <!-- Findings -->
+        <section class="section">
+            <h2 class="section-title">Detailed Findings ({findings_count})</h2>
+            <div class="findings-list">
+                {findings_cards}
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Generated by Laravel Security Scanner v1.5.0</p>
+            <p>Report generated on {generation_date}</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Initialize Charts
+        const severityCtx = document.getElementById('severityChart').getContext('2d');
+        new Chart(severityCtx, {{
+            type: 'doughnut',
+            data: {{
+                labels: ['Critical', 'High', 'Medium', 'Low', 'Info'],
+                datasets: [{{
+                    data: [{critical_count}, {high_count}, {medium_count}, {low_count}, {info_count}],
+                    backgroundColor: ['#dc2626', '#ea580c', '#ca8a04', '#2563eb', '#64748b'],
+                    borderWidth: 0
+                }}]
+            }},
+            options: {{
+                responsive: true,
+                plugins: {{
+                    legend: {{
+                        position: 'bottom',
+                        labels: {{
+                            color: '#94a3b8',
+                            padding: 20,
+                            font: {{ size: 12 }}
+                        }}
+                    }}
+                }}
+            }}
+        }});
+        
+        // Severity Timeline
+        const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+        new Chart(timelineCtx, {{
+            type: 'bar',
+            data: {{
+                labels: ['Config', 'Auth', 'Headers', 'Secrets', 'Database', 'Input'],
+                datasets: [{{
+                    label: 'Score',
+                    data: [{config_score}, {auth_score}, {headers_score}, {secrets_score}, {database_score}, {input_score}],
+                    backgroundColor: ['#3b82f6', '#16a34a', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4'],
+                    borderRadius: 8
+                }}]
+            }},
+            options: {{
+                responsive: true,
+                scales: {{
+                    y: {{
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {{ color: '#334155' }},
+                        ticks: {{ color: '#94a3b8' }}
+                    }},
+                    x: {{
+                        grid: {{ display: false }},
+                        ticks: {{ color: '#94a3b8', font: {{ size: 11 }} }}
+                    }}
+                }},
+                plugins: {{
+                    legend: {{ display: false }}
+                }}
+            }}
+        }});
+        
+        // Finding Card Toggle
+        document.querySelectorAll('.finding-header').forEach(header => {{
+            header.addEventListener('click', () => {{
+                header.parentElement.classList.toggle('expanded');
+            }});
+        }});
+        
+        // Share Function
+        function shareReport() {{
+            if (navigator.share) {{
+                navigator.share({{
+                    title: 'Security Scan Report - {target_url}',
+                    text: 'Security Score: {score}/100 - {grade}',
+                    url: window.location.href
+                }});
+            }} else {{
+                navigator.clipboard.writeText(window.location.href);
+                alert('Link copied to clipboard!');
+            }}
+        }}
+        
+        // Animate score gauge
+        setTimeout(() => {{
+            document.querySelector('.score-gauge-fill').style.strokeDashoffset = '{score_offset}';
+        }}, 300);
+    </script>
+</body>
+</html>

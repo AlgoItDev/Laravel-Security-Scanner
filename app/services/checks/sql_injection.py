@@ -262,11 +262,22 @@ class SQLInjectionCheck(BaseCheck):
             ),
             evidence="\n".join(evidence_parts[:8]),
             remediation=(
-                "1. Use parameterized queries or prepared statements.\n"
-                "2. Use Laravel's Eloquent ORM or Query Builder with bindings.\n"
-                "3. Validate and sanitize all user input.\n"
-                "4. Implement least-privilege database users.\n"
-                "5. Use WAF as additional Layer."
+                "🚨 CRITICAL: SQL Injection - Veritabanı tamamen tehlikede!\n\n"
+                "🛡️ 1. Parameterized Query (ZORUNLU):\n"
+                "   # ❌ KULLANMA:\n"
+                "   DB::raw(\"SELECT * FROM users WHERE id = $id\")\n\n"
+                "   # ✅ KULLAN:\n"
+                "   User::where('id', $id)->first();\n"
+                "   DB::table('users')->where('id', $id)->first();\n"
+                "   DB::select('SELECT * FROM users WHERE id = ?', [$id]);\n\n"
+                "📝 2. Validation:\n"
+                "   $request->validate(['id' => 'integer|min:1']);\n\n"
+                "🔒 3. Least Privilege:\n"
+                "   # MySQL'de: sadece gerekli yetkiler ver\n"
+                "   GRANT SELECT, INSERT, UPDATE ON app_db.* TO 'app'@'localhost';\n\n"
+                "🛡️ 4. WAF (Ek katman):\n"
+                "   - AWS WAF, Cloudflare, SafeLine\n\n"
+                "🔗 Ref: https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html"
             ),
             cvss_score=9.5 if confidence >= 0.8 else (7.5 if confidence >= 0.6 else 5.0),
             references=[

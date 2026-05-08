@@ -251,11 +251,25 @@ class XSSCheck(BaseCheck):
             ),
             evidence="\n".join(evidence_parts[:8]),
             remediation=(
-                "1. Use Blade's {{ }} syntax (auto-escapes).\n"
-                "2. Use e() helper for manual escaping.\n"
-                "3. Implement Content-Security-Policy (CSP).\n"
-                "4. Use HttpOnly and Secure flags on cookies.\n"
-                "5. Sanitize user input with libraries like HTMLPurifier."
+                "⚠️ HIGH: XSS - Stored/Reflected script çalıştırılabilir!\n\n"
+                "🛡️ 1. Blade Auto-Escape (EN İYİ):\n"
+                "   # ❌ KULLANMA:\n"
+                "   {!! $input !!}\n\n"
+                "   # ✅ KULLAN:\n"
+                "   {{ $input }}\n"
+                "   {{ e($input) }}  # Manual escape\n\n"
+                "📝 2. Input Validation:\n"
+                "   $request->validate(['input' => 'string|max:100']);\n\n"
+                "🍪 3. Cookie Güvenliği:\n"
+                "   # Kernel.php (Http/Kernel)\n"
+                "   protected $middleware = [\n"
+                "       \\Illuminate\\Cookie\\Middleware\\EncryptCookies::class,\n"
+                "       // ...\n"
+                "   ];\n\n"
+                "🛡️ 4. CSP Header:\n"
+                "   # config/security_headers.php ekle:\n"
+                "   'Content-Security-Policy' => \"default-src 'self'\",\n\n"
+                "🔗 Ref: https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
             ),
             cvss_score=7.5 if confidence >= 0.7 else (5.0 if confidence >= 0.5 else 3.0),
             references=[

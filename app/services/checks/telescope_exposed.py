@@ -74,13 +74,24 @@ class TelescopeExposedCheck(BaseCheck):
                 ),
                 evidence=f"Exposed paths: {', '.join(exposed_paths)}",
                 remediation=(
-                    "1. Remove Telescope package from production: "
-                    "`composer remove laravel/telescope --dev`\n"
-                    "2. Or ensure Telescope is only enabled in non-production environments:\n"
-                    "   In `app/Providers/TelescopeServiceProvider.php`, wrap in environment check:\n"
-                    "   `if ($this->app->environment('local')) { $this->register(); }`\n"
-                    "3. Configure web server to deny access to /telescope path.\n"
-                    "4. Use `Telescope::night()` or `Telescope::ignoreMigrations()` as needed."
+                    "⚠️ HIGH: Telescope public! Debug ve credential bilgileri sızdırabilir!\n\n"
+                    "🛡️ Seçenek 1: Production'dan Kaldır (ÖNERİLEN):\n"
+                    "   composer remove laravel/telescope --dev\n\n"
+                    "🛡️ Seçenek 2: Environment Kısıtı:\n"
+                    "   # app/Providers/TelescopeServiceProvider.php:\n"
+                    "   public function register() {\n"
+                    "       if ($this->app->environment('local')) {\n"
+                    "           $this->register();\n"
+                    "       }\n"
+                    "   }\n\n"
+                    "🛡️ Seçenek 3: Nginx ile Engelle:\n"
+                    "   location /telescope {\n"
+                    "       deny all;\n"
+                    "       return 404;\n"
+                    "   }\n\n"
+                    "🛡️ Seçenek 4: Basic Auth:\n"
+                    "   # IP whitelist veya Basic Auth ekle\n"
+                    "🔗 Ref: https://laravel.com/docs/telescope"
                 ),
                 cvss_score=7.5,
                 references=[

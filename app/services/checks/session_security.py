@@ -91,16 +91,22 @@ class SessionSecurityCheck(BaseCheck):
                 description=f"Session security issues found: {'; '.join(issues)}",
                 evidence="\n".join(evidence_details) if evidence_details else "Session cookie issues detected",
                 remediation=(
-                    "1. Enable Secure flag in session config:\n"
-                    "   In `config/session.php`: 'secure' => env('SESSION_SECURE_COOKIE', true),\n"
-                    "2. Enable HttpOnly flag:\n"
-                    "   'httponly' => true,\n"
-                    "3. Set SameSite attribute:\n"
-                    "   'samesite' => 'lax', // or 'strict'\n"
-                    "4. Consider changing session cookie name:\n"
-                    "   'cookie' => 'myapp_session', // not default name\n"
-                    "5. Use secure session driver for production:\n"
-                    "   'driver' => 'redis' or 'memcached', // not 'file'"
+                    "⚠️ HIGH: Session cookie güvenlik eksik! Hijacking riski!\n\n"
+                    "🛡️ 1. config/session.php ayarları:\n"
+                    "   'driver' => env('SESSION_DRIVER', 'redis'),\n"
+                    "   'secure' => env('SESSION_SECURE_COOKIE', true),  # HTTPS!\n"
+                    "   'httponly' => true,  # JS erişimi yok\n"
+                    "   'samesite' => 'lax',  # CSRF koruma\n\n"
+                    "🛡️ 2. Cookie name değiştir:\n"
+                    "   'cookie' => env('SESSION_COOKIE', 'app_session'),\n\n"
+                    "🛡️ 3. Redis (önerilen):\n"
+                    "   # .env:\n"
+                    "   SESSION_DRIVER=redis\n"
+                    "   REDIS_HOST=127.0.0.1\n\n"
+                    "🛡️ 4. Lifetime kısıtla:\n"
+                    "   'lifetime' => env('SESSION_LIFETIME', 120),\n"
+                    "   'expire_on_close' => true,\n\n"
+                    "🔗 Ref: https://laravel.com/docs/session"
                 ),
                 cvss_score=6.5 if severity == Severity.HIGH else 4.0,
                 references=[

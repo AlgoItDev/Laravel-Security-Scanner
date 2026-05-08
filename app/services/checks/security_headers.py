@@ -30,37 +30,80 @@ HEADER_RULES: list[HeaderRule] = [
         name="Strict-Transport-Security",
         severity=Severity.HIGH,
         description="HSTS header missing — site is vulnerable to protocol downgrade attacks.",
-        remediation="Add: `Strict-Transport-Security: max-age=31536000; includeSubDomains`",
+        remediation=(
+            "🛡️ HSTS (HTTP Strict Transport Security):\n"
+            "   # app/Http/Middleware/TrustProxies.php:\n"
+            "   'Strict-Transport-Security' => 'max-age=31536000; includeSubDomains'\n\n"
+            "   # Nginx:\n"
+            "   add_header Strict-Transport-Security \"max-age=31536000; includeSubDomains\";\n\n"
+            "   # .htaccess:\n"
+            "   Header always set Strict-Transport-Security \"max-age=31536000; includeSubDomains\""
+        ),
     ),
     HeaderRule(
         name="X-Frame-Options",
         severity=Severity.MEDIUM,
         description="Missing X-Frame-Options — site may be clickjackable.",
-        remediation="Add: `X-Frame-Options: SAMEORIGIN` or use a CSP `frame-ancestors` directive.",
+        remediation=(
+            "🛡️ X-Frame-Options (Clickjacking koruması):\n"
+            "   # Nginx:\n"
+            "   add_header X-Frame-Options \"SAMEORIGIN\";\n\n"
+            "   # Laravel (Bootstrap/app.php):\n"
+            "   'X-Frame-Options' => 'SAMEORIGIN',\n\n"
+            "   # Veya CSP frame-ancestors kullan:\n"
+            "   'Content-Security-Policy' => \"frame-ancestors 'self'\""
+        ),
     ),
     HeaderRule(
         name="X-Content-Type-Options",
         severity=Severity.MEDIUM,
         description="Missing X-Content-Type-Options — MIME-sniffing attacks possible.",
-        remediation="Add: `X-Content-Type-Options: nosniff`",
+        remediation=(
+            "🛡️ X-Content-Type-Options:\n"
+            "   # Nginx:\n"
+            "   add_header X-Content-Type-Options \"nosniff\";\n\n"
+            "   # Laravel:\n"
+            "   'X-Content-Type-Options' => 'nosniff'"
+        ),
     ),
     HeaderRule(
         name="Content-Security-Policy",
         severity=Severity.MEDIUM,
         description="No Content-Security-Policy — XSS and data injection risks elevated.",
-        remediation="Define a strict CSP. Start with: `Content-Security-Policy: default-src 'self'`",
+        remediation=(
+            "🛡️ Content-Security-Policy (CSP) - En güçlü koruma:\n"
+            "   # Başlangıç (relaxed):\n"
+            "   'Content-Security-Policy' => \"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'\"\n\n"
+            "   # İleri (strict):\n"
+            "   'Content-Security-Policy' => \"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'\"\n\n"
+            "   # Laravel MIX (vite.config.js):\n"
+            "   // CSP plugin ile Vite\n\n"
+            "🔗 Ref: https://content-security-policy.com/"
+        ),
     ),
     HeaderRule(
         name="Referrer-Policy",
         severity=Severity.LOW,
         description="Missing Referrer-Policy — referrer leakage possible.",
-        remediation="Add: `Referrer-Policy: strict-origin-when-cross-origin`",
+        remediation=(
+            "🛡️ Referrer-Policy:\n"
+            "   # Laravel:\n"
+            "   'Referrer-Policy' => 'strict-origin-when-cross-origin'\n\n"
+            "   # Nginx:\n"
+            "   add_header Referrer-Policy \"strict-origin-when-cross-origin\";"
+        ),
     ),
     HeaderRule(
         name="Permissions-Policy",
         severity=Severity.LOW,
         description="Missing Permissions-Policy — browser feature access not restricted.",
-        remediation="Add: `Permissions-Policy: geolocation=(), microphone=(), camera=()`",
+        remediation=(
+            "🛡️ Permissions-Policy (Browser features kısıtlama):\n"
+            "   # Laravel:\n"
+            "   'Permissions-Policy' => 'camera=(), microphone=(), geolocation=()'\n\n"
+            "   # Nginx:\n"
+            "   add_header Permissions-Policy \"camera=(), microphone=(), geolocation=();\""
+        ),
     ),
     HeaderRule(
         name="X-Powered-By",
@@ -70,8 +113,13 @@ HEADER_RULES: list[HeaderRule] = [
             "Aids fingerprinting."
         ),
         remediation=(
-            "Remove via PHP config (`expose_php = Off`) or web server "
-            "(`Header unset X-Powered-By`)."
+            "🛡️ X-Powered-By Kaldır:\n"
+            "   # php.ini:\n"
+            "   expose_php = Off\n\n"
+            "   # Nginx:\n"
+            "   more_clear_headers 'X-Powered-By';\n\n"
+            "   # Apache:\n"
+            "   Header unset X-Powered-By"
         ),
     ),
 ]

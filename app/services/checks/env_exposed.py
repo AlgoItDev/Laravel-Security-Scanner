@@ -73,11 +73,23 @@ class EnvExposedCheck(BaseCheck):
                 ),
                 evidence="\n---\n".join(evidence_snippets),
                 remediation=(
-                    "1. Immediately rotate all credentials in the exposed .env files.\n"
-                    "2. Configure your web server to deny access to dot-files.\n"
-                    "   Nginx: add `location ~ /\\.env { deny all; }` to your server block.\n"
-                    "   Apache: add `<FilesMatch \"^\\.env\"> Deny from all </FilesMatch>`.\n"
-                    "3. Ensure .env is listed in .gitignore."
+                    "🚨 CRITICAL: .env dosyası public! Tüm credential'lar tehlikede!\n\n"
+                    "🛡️ 1. ACIL: Credential'ları değiştir:\n"
+                    "   - DB_PASSWORD\n"
+                    "   - API_KEYS, AWS keys\n"
+                    "   - JWT_SECRET\n"
+                    "   - Mail, Redis credentials\n\n"
+                    "📁 2. Web server block (.htaccess / nginx.conf):\n"
+                    "   # Nginx:\n"
+                    "   location ~ /\\.env { deny all; return 404; }\n"
+                    "   location ~ /\\. { deny all; return 404; }\n\n"
+                    "   # Apache (.htaccess):\n"
+                    "   <FilesMatch \"^\\.\">\n"
+                    "       Deny from all\n"
+                    "   </FilesMatch>\n\n"
+                    "✅ 3. .gitignore kontrol:\n"
+                    "   # .env dosyası DEĞİL, ama .env.example ekle\n\n"
+                    "🔗 Ref: https://laravel.com/docs/deployment#server-configuration"
                 ),
                 cvss_score=9.8,
                 references=[
