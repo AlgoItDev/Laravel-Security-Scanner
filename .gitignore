@@ -1,6 +1,38 @@
+# GitHub workflows
 .github/workflows/ci.yml
 
-/logs
-/reports
-DEV_NOTE.txt
+# Build artifacts
+*.egg-info/
+build/
+dist/
+laravel_security_scanner.egg-info/
+
+# Logs
+logs/
 logs/scanner.log
+
+# Reports
+reports/
+
+# Cache files
+osv_cache.json
+
+# Development notes (contains secrets)
+DEV_NOTE.txt
+
+# Environment
+.env
+.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+.eggs/
+*.egg
+.pytest_cache/

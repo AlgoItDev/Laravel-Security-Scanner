@@ -24,6 +24,8 @@ Production-grade Python CLI tool for auditing Laravel web applications for commo
 | `COMPOSER_CVE` | Composer.lock CVE scan (OSV API + local DB) | CRITICAL |
 | `SQL_INJECTION_BLIND` | Blind SQL injection vulnerability | CRITICAL |
 | `XSS_REFLECTED` | Reflected XSS vulnerability | HIGH |
+
+> **Note**: `SQL_INJECTION_BLIND` and `XSS_REFLECTED` checks are lightweight passive probes, not full exploitation scanners. For comprehensive testing, combine with tools like SQLMap or Burp Suite.
 | `JWT_ANALYSIS` | JWT token security issues | HIGH |
 | `CORS_MISCONFIG` | CORS misconfiguration | MEDIUM |
 | `OPEN_REDIRECT` | Open redirect vulnerability | MEDIUM |
