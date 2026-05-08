@@ -10,6 +10,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Nothing unreleased yet.
 
+## [1.2.0] - 2026-05-08
+
+### Added
+- **6 New Security Checks**:
+  - `SQL_INJECTION_BLIND` - Blind SQL injection vulnerability detection (CRITICAL)
+    - Tests URL parameters with various SQL injection payloads
+    - Detects SQL error patterns in responses
+    - CVSS Score: 9.5
+  - `XSS_REFLECTED` - Reflected Cross-Site Scripting detection (HIGH)
+    - Tests URL parameters for XSS payload reflection
+    - Checks for proper HTML encoding
+    - CVSS Score: 7.5
+  - `JWT_ANALYSIS` - JWT token security analysis (HIGH)
+    - Detects weak algorithms (HS256)
+    - Checks for missing expiration claims
+    - Identifies none algorithm vulnerabilities
+    - CVSS Score: 7.0
+  - `CORS_MISCONFIG` - CORS misconfiguration detection (MEDIUM)
+    - Detects wildcard origins (*)
+    - Identifies credentials with wildcard origins
+    - CVSS Score: 5.5
+  - `OPEN_REDIRECT` - Open redirect vulnerability detection (MEDIUM)
+    - Tests redirect parameters with external payloads
+    - Analyzes Location header behavior
+    - CVSS Score: 6.0
+  - `SUBDOMAIN_ENUM` - Subdomain enumeration (INFO)
+    - Discovers subdomains with common naming patterns
+    - Identifies exposed internal services
+    - 40+ common subdomain prefixes tested
+
+- **Test Coverage**: Added unit tests for all 6 new checks
+  - Total: 11 new tests added
+
+### Changed
+- `__init__.py` updated to include 6 new checks in ALL_CHECKS list
+- Total security checks increased from 16 to 22
+
+### Fixed
+- Syntax warning in `open_redirect.py` (invalid escape sequence)
+- Fixed corrupted test files with double underscores (pytest__, httpx__, etc.)
+
 ## [1.1.0] - 2026-05-06
 
 ### Added
@@ -62,7 +103,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Check filtering by ID
   - Rate-limited client
   - Retry mechanism
-  
+
 - Updated `ReportService` to support:
   - HTML report generation
   - SARIF format for GitHub Security tab

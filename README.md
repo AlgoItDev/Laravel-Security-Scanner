@@ -26,6 +26,12 @@ Production-grade Python CLI tool for auditing Laravel web applications for commo
 | `RATE_LIMITING` | Rate limiting missing | 🟠 MEDIUM |
 | `HTTP_METHODS` | Dangerous HTTP methods enabled | 🟠 MEDIUM |
 | `COMPOSER_CVE` | Composer.lock CVE scan | 🔴 CRITICAL |
+| `SQL_INJECTION_BLIND` | Blind SQL injection vulnerability | 🔴 CRITICAL |
+| `XSS_REFLECTED` | Reflected XSS vulnerability | 🔴 HIGH |
+| `JWT_ANALYSIS` | JWT token security issues | 🔴 HIGH |
+| `CORS_MISCONFIG` | CORS misconfiguration | 🟠 MEDIUM |
+| `OPEN_REDIRECT` | Open redirect vulnerability | 🟠 MEDIUM |
+| `SUBDOMAIN_ENUM` | Subdomain enumeration | 🟢 LOW |
 
 ## 📁 Project Structure
 
@@ -199,11 +205,11 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
 ## 📌 Version
 
-Current version: **v1.1.0** (see [VERSION](VERSION) file)
+Current version: **v1.2.0** (see [VERSION](VERSION) file)
 
 ---
 
-**🎯 Total Security Checks**: 16  
-**📊 Output Formats**: 5 (Console, JSON, TXT, HTML, SARIF)  
-**🧪 Tests**: 51 passing  
+**🎯 Total Security Checks**: 22
+**📊 Output Formats**: 5 (Console, JSON, TXT, HTML, SARIF)
+**🧪 Tests**: 60+ passing
 **🚀 CI/CD**: GitHub Actions ready

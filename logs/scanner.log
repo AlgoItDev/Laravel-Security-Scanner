@@ -385,3 +385,91 @@
 2026-05-07 10:10:07 | INFO     | app.services.reporter:save_txt:139 - TXT report saved: reports\scan_https___bbgayrimenkul_net_20260507_091007.txt
 2026-05-07 10:10:07 | INFO     | app.services.reporter:save_html:255 - HTML report saved: reports\scan_https___bbgayrimenkul_net_20260507_091007.html
 2026-05-07 10:10:07 | INFO     | app.services.reporter:save_sarif:345 - SARIF report saved: reports\scan_https___bbgayrimenkul_net_20260507_091007.sarif.json
+2026-05-08 13:45:47 | WARNING  | app.services.checks.composer_lock_cve:_load_cve_database:198 - [COMPOSER_CVE] Failed to load CVE database: No module named 'os__'
+2026-05-08 13:45:48 | WARNING  | app.services.checks.composer_lock_cve:_load_cve_database:198 - [COMPOSER_CVE] Failed to load CVE database: No module named 'os__'
+2026-05-08 13:45:48 | WARNING  | app.services.checks.composer_lock_cve:run:168 - [COMPOSER_CVE] Timeout for https://example.com/composer.lock
+2026-05-08 13:45:48 | WARNING  | app.services.checks.csrf_protection:run:134 - [CSRF_PROTECTION] Timeout for https://example.com
+2026-05-08 13:45:48 | WARNING  | app.services.checks.debugbar_exposed:run:61 - [DEBUGBAR_EXPOSED] Timeout for https://example.com/_debugbar
+2026-05-08 13:45:48 | WARNING  | app.services.checks.debugbar_exposed:run:61 - [DEBUGBAR_EXPOSED] Timeout for https://example.com/_debugbar/clockwork
+2026-05-08 13:45:48 | WARNING  | app.services.checks.debugbar_exposed:run:61 - [DEBUGBAR_EXPOSED] Timeout for https://example.com/debugbar
+2026-05-08 13:45:48 | WARNING  | app.services.checks.horizon_exposed:run:61 - [HORIZON_EXPOSED] Timeout for https://example.com/horizon
+2026-05-08 13:45:48 | WARNING  | app.services.checks.horizon_exposed:run:61 - [HORIZON_EXPOSED] Timeout for https://example.com/horizon/dashboard
+2026-05-08 13:45:48 | WARNING  | app.services.checks.horizon_exposed:run:61 - [HORIZON_EXPOSED] Timeout for https://example.com/horizon/api/metrics
+2026-05-08 13:45:48 | WARNING  | app.services.checks.horizon_exposed:run:61 - [HORIZON_EXPOSED] Timeout for https://example.com/horizon/api/jobs
+2026-05-08 13:45:48 | WARNING  | app.services.checks.http_methods:run:61 - [HTTP_METHODS] Timeout for PUT https://example.com
+2026-05-08 13:45:48 | WARNING  | app.services.checks.http_methods:run:61 - [HTTP_METHODS] Timeout for DELETE https://example.com
+2026-05-08 13:45:48 | WARNING  | app.services.checks.http_methods:run:61 - [HTTP_METHODS] Timeout for TRACE https://example.com
+2026-05-08 13:45:48 | WARNING  | app.services.checks.http_methods:run:61 - [HTTP_METHODS] Timeout for OPTIONS https://example.com
+2026-05-08 13:45:48 | WARNING  | app.services.checks.http_methods:run:61 - [HTTP_METHODS] Timeout for PATCH https://example.com
+2026-05-08 13:45:48 | WARNING  | app.services.checks.laravel_version:run:99 - [LARAVEL_VERSION] Error checking Laravel version: Connection failed
+2026-05-08 13:45:48 | WARNING  | app.services.checks.mix_manifest_exposed:run:67 - [MIX_MANIFEST_EXPOSED] Timeout for https://example.com/mix-manifest.json
+2026-05-08 13:45:48 | WARNING  | app.services.checks.nova_exposed:run:62 - [NOVA_EXPOSED] Timeout for https://example.com/nova
+2026-05-08 13:45:48 | WARNING  | app.services.checks.nova_exposed:run:62 - [NOVA_EXPOSED] Timeout for https://example.com/nova/dashboard
+2026-05-08 13:45:48 | WARNING  | app.services.checks.nova_exposed:run:62 - [NOVA_EXPOSED] Timeout for https://example.com/nova-api/
+2026-05-08 13:45:50 | WARNING  | app.services.checks.rate_limiting:run:94 - [RATE_LIMITING] Timeout for https://example.com
+2026-05-08 13:45:50 | WARNING  | app.services.checks.session_security:run:129 - [SESSION_SECURITY] Timeout for https://example.com
+2026-05-08 13:45:50 | WARNING  | app.services.checks.telescope_exposed:run:61 - [TELESCOPE_EXPOSED] Timeout for https://example.com/telescope
+2026-05-08 13:45:50 | WARNING  | app.services.checks.telescope_exposed:run:61 - [TELESCOPE_EXPOSED] Timeout for https://example.com/telescope/requests
+2026-05-08 13:45:50 | WARNING  | app.services.checks.telescope_exposed:run:61 - [TELESCOPE_EXPOSED] Timeout for https://example.com/telescope/exceptions
+2026-05-08 13:45:50 | WARNING  | app.services.checks.telescope_exposed:run:61 - [TELESCOPE_EXPOSED] Timeout for https://example.com/telescope/logs
+2026-05-08 13:45:50 | WARNING  | app.services.checks.telescope_exposed:run:61 - [TELESCOPE_EXPOSED] Timeout for https://example.com/_debugbar/telescope
+2026-05-08 13:46:12 | WARNING  | app.services.checks.composer_lock_cve:_load_cve_database:198 - [COMPOSER_CVE] Failed to load CVE database: No module named 'os__'
+2026-05-08 13:46:13 | WARNING  | app.services.checks.composer_lock_cve:_load_cve_database:198 - [COMPOSER_CVE] Failed to load CVE database: No module named 'os__'
+2026-05-08 13:46:13 | WARNING  | app.services.checks.composer_lock_cve:run:168 - [COMPOSER_CVE] Timeout for https://example.com/composer.lock
+2026-05-08 13:46:13 | WARNING  | app.services.checks.csrf_protection:run:134 - [CSRF_PROTECTION] Timeout for https://example.com
+2026-05-08 13:46:13 | WARNING  | app.services.checks.debugbar_exposed:run:61 - [DEBUGBAR_EXPOSED] Timeout for https://example.com/_debugbar
+2026-05-08 13:46:13 | WARNING  | app.services.checks.debugbar_exposed:run:61 - [DEBUGBAR_EXPOSED] Timeout for https://example.com/_debugbar/clockwork
+2026-05-08 13:46:13 | WARNING  | app.services.checks.debugbar_exposed:run:61 - [DEBUGBAR_EXPOSED] Timeout for https://example.com/debugbar
+2026-05-08 13:46:13 | WARNING  | app.services.checks.horizon_exposed:run:61 - [HORIZON_EXPOSED] Timeout for https://example.com/horizon
+2026-05-08 13:46:13 | WARNING  | app.services.checks.horizon_exposed:run:61 - [HORIZON_EXPOSED] Timeout for https://example.com/horizon/dashboard
+2026-05-08 13:46:13 | WARNING  | app.services.checks.horizon_exposed:run:61 - [HORIZON_EXPOSED] Timeout for https://example.com/horizon/api/metrics
+2026-05-08 13:46:13 | WARNING  | app.services.checks.horizon_exposed:run:61 - [HORIZON_EXPOSED] Timeout for https://example.com/horizon/api/jobs
+2026-05-08 13:46:13 | WARNING  | app.services.checks.http_methods:run:61 - [HTTP_METHODS] Timeout for PUT https://example.com
+2026-05-08 13:46:13 | WARNING  | app.services.checks.http_methods:run:61 - [HTTP_METHODS] Timeout for DELETE https://example.com
+2026-05-08 13:46:13 | WARNING  | app.services.checks.http_methods:run:61 - [HTTP_METHODS] Timeout for TRACE https://example.com
+2026-05-08 13:46:13 | WARNING  | app.services.checks.http_methods:run:61 - [HTTP_METHODS] Timeout for OPTIONS https://example.com
+2026-05-08 13:46:13 | WARNING  | app.services.checks.http_methods:run:61 - [HTTP_METHODS] Timeout for PATCH https://example.com
+2026-05-08 13:46:13 | WARNING  | app.services.checks.laravel_version:run:99 - [LARAVEL_VERSION] Error checking Laravel version: Connection failed
+2026-05-08 13:46:13 | WARNING  | app.services.checks.mix_manifest_exposed:run:67 - [MIX_MANIFEST_EXPOSED] Timeout for https://example.com/mix-manifest.json
+2026-05-08 13:46:13 | WARNING  | app.services.checks.nova_exposed:run:62 - [NOVA_EXPOSED] Timeout for https://example.com/nova
+2026-05-08 13:46:13 | WARNING  | app.services.checks.nova_exposed:run:62 - [NOVA_EXPOSED] Timeout for https://example.com/nova/dashboard
+2026-05-08 13:46:13 | WARNING  | app.services.checks.nova_exposed:run:62 - [NOVA_EXPOSED] Timeout for https://example.com/nova-api/
+2026-05-08 13:46:14 | WARNING  | app.services.checks.rate_limiting:run:94 - [RATE_LIMITING] Timeout for https://example.com
+2026-05-08 13:46:14 | WARNING  | app.services.checks.session_security:run:129 - [SESSION_SECURITY] Timeout for https://example.com
+2026-05-08 13:46:14 | WARNING  | app.services.checks.telescope_exposed:run:61 - [TELESCOPE_EXPOSED] Timeout for https://example.com/telescope
+2026-05-08 13:46:14 | WARNING  | app.services.checks.telescope_exposed:run:61 - [TELESCOPE_EXPOSED] Timeout for https://example.com/telescope/requests
+2026-05-08 13:46:14 | WARNING  | app.services.checks.telescope_exposed:run:61 - [TELESCOPE_EXPOSED] Timeout for https://example.com/telescope/exceptions
+2026-05-08 13:46:14 | WARNING  | app.services.checks.telescope_exposed:run:61 - [TELESCOPE_EXPOSED] Timeout for https://example.com/telescope/logs
+2026-05-08 13:46:14 | WARNING  | app.services.checks.telescope_exposed:run:61 - [TELESCOPE_EXPOSED] Timeout for https://example.com/_debugbar/telescope
+2026-05-08 13:49:05 | WARNING  | app.services.checks.csrf_protection:run:134 - [CSRF_PROTECTION] Timeout for https://example.com
+2026-05-08 13:49:05 | WARNING  | app.services.checks.debugbar_exposed:run:61 - [DEBUGBAR_EXPOSED] Timeout for https://example.com/_debugbar
+2026-05-08 13:49:05 | WARNING  | app.services.checks.debugbar_exposed:run:61 - [DEBUGBAR_EXPOSED] Timeout for https://example.com/_debugbar/clockwork
+2026-05-08 13:49:05 | WARNING  | app.services.checks.debugbar_exposed:run:61 - [DEBUGBAR_EXPOSED] Timeout for https://example.com/debugbar
+2026-05-08 13:49:05 | WARNING  | app.services.checks.horizon_exposed:run:61 - [HORIZON_EXPOSED] Timeout for https://example.com/horizon
+2026-05-08 13:49:05 | WARNING  | app.services.checks.horizon_exposed:run:61 - [HORIZON_EXPOSED] Timeout for https://example.com/horizon/dashboard
+2026-05-08 13:49:05 | WARNING  | app.services.checks.horizon_exposed:run:61 - [HORIZON_EXPOSED] Timeout for https://example.com/horizon/api/metrics
+2026-05-08 13:49:05 | WARNING  | app.services.checks.horizon_exposed:run:61 - [HORIZON_EXPOSED] Timeout for https://example.com/horizon/api/jobs
+2026-05-08 13:49:05 | WARNING  | app.services.checks.http_methods:run:61 - [HTTP_METHODS] Timeout for PUT https://example.com
+2026-05-08 13:49:05 | WARNING  | app.services.checks.http_methods:run:61 - [HTTP_METHODS] Timeout for DELETE https://example.com
+2026-05-08 13:49:05 | WARNING  | app.services.checks.http_methods:run:61 - [HTTP_METHODS] Timeout for TRACE https://example.com
+2026-05-08 13:49:05 | WARNING  | app.services.checks.http_methods:run:61 - [HTTP_METHODS] Timeout for OPTIONS https://example.com
+2026-05-08 13:49:05 | WARNING  | app.services.checks.http_methods:run:61 - [HTTP_METHODS] Timeout for PATCH https://example.com
+2026-05-08 13:49:05 | WARNING  | app.services.checks.laravel_version:run:99 - [LARAVEL_VERSION] Error checking Laravel version: Connection failed
+2026-05-08 13:49:05 | WARNING  | app.services.checks.mix_manifest_exposed:run:67 - [MIX_MANIFEST_EXPOSED] Timeout for https://example.com/mix-manifest.json
+2026-05-08 13:49:05 | WARNING  | app.services.checks.nova_exposed:run:62 - [NOVA_EXPOSED] Timeout for https://example.com/nova
+2026-05-08 13:49:05 | WARNING  | app.services.checks.nova_exposed:run:62 - [NOVA_EXPOSED] Timeout for https://example.com/nova/dashboard
+2026-05-08 13:49:05 | WARNING  | app.services.checks.nova_exposed:run:62 - [NOVA_EXPOSED] Timeout for https://example.com/nova-api/
+2026-05-08 13:49:06 | WARNING  | app.services.checks.rate_limiting:run:94 - [RATE_LIMITING] Timeout for https://example.com
+2026-05-08 13:49:06 | WARNING  | app.services.checks.session_security:run:129 - [SESSION_SECURITY] Timeout for https://example.com
+2026-05-08 13:49:06 | WARNING  | app.services.checks.telescope_exposed:run:61 - [TELESCOPE_EXPOSED] Timeout for https://example.com/telescope
+2026-05-08 13:49:06 | WARNING  | app.services.checks.telescope_exposed:run:61 - [TELESCOPE_EXPOSED] Timeout for https://example.com/telescope/requests
+2026-05-08 13:49:06 | WARNING  | app.services.checks.telescope_exposed:run:61 - [TELESCOPE_EXPOSED] Timeout for https://example.com/telescope/exceptions
+2026-05-08 13:49:06 | WARNING  | app.services.checks.telescope_exposed:run:61 - [TELESCOPE_EXPOSED] Timeout for https://example.com/telescope/logs
+2026-05-08 13:49:06 | WARNING  | app.services.checks.telescope_exposed:run:61 - [TELESCOPE_EXPOSED] Timeout for https://example.com/_debugbar/telescope
+2026-05-08 13:55:40 | INFO     | __main__:main:125 - Laravel Security Scanner v1.0.0 starting
+2026-05-08 13:55:40 | INFO     | app.services.scanner:scan:56 - Starting scan for: https://bbgayrimenkul.net
+2026-05-08 13:56:04 | INFO     | app.services.scanner:_log_summary:117 - Scan complete | target=https://bbgayrimenkul.net | findings=22 | vulnerable=6 | risk_score=3.83 | duration=23.82s
+2026-05-08 13:56:04 | INFO     | app.services.reporter:save_json:104 - JSON report saved: reports\scan_https___bbgayrimenkul_net_20260508_125604.json
+2026-05-08 13:56:04 | INFO     | app.services.reporter:save_txt:139 - TXT report saved: reports\scan_https___bbgayrimenkul_net_20260508_125604.txt
+2026-05-08 13:56:04 | INFO     | app.services.reporter:save_html:255 - HTML report saved: reports\scan_https___bbgayrimenkul_net_20260508_125604.html
+2026-05-08 13:56:04 | INFO     | app.services.reporter:save_sarif:345 - SARIF report saved: reports\scan_https___bbgayrimenkul_net_20260508_125604.sarif.json
