@@ -16,7 +16,6 @@ keywords = ["laravel", "security", "scanner", "vulnerability", "audit", "cli"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "Intended Audience :: System Administrators",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
@@ -32,6 +31,7 @@ dependencies = [
     "pydantic-settings>=2.3.0",
     "loguru>=0.7.2",
     "rich>=13.0.0",
+    "phply>=0.4.1",
 ]
 
 [project.optional-dependencies]
@@ -50,7 +50,10 @@ Issues = "https://github.com/AlgoDev/Laravel-Security-Scanner/issues"
 [project.scripts]
 laravel-sec-scanner = "main:main"
 
+[tool.setuptools]
+py-modules = ["main"]
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["app*"]
-exclude = ["logs*", "reports*"]
+exclude = ["logs", "reports", "tests"]

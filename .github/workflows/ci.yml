@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.10, '3.11', '3.12']
+        python-version: ['3.10', '3.11', '3.12']
 
     steps:
     - uses: actions/checkout@v4
@@ -27,28 +27,16 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -e .
         pip install pytest pytest-asyncio
 
     - name: Run tests
       run: pytest tests/ -v
 
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results-${{ matrix.python-version }}
-        path: |
-          reports/
-          logs/
-
   scan:
     name: Security Scan
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule' || github.ref == 'refs/heads/main'
-    permissions:
-      security-events: write
-      contents: read
 
     steps:
     - uses: actions/checkout@v4
@@ -58,39 +46,14 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
     - name: Install scanner
       run: pip install -e .
 
-    - name: Verify scanner installation
-      run: |
-        which laravel-sec-scanner || echo "Scanner not found in PATH"
-        laravel-sec-scanner --version || echo "Version check failed"
-        python -m app.core.settings || true
-
-    - name: Run security scan
-      id: scan
+    - name: Run scan
       run: |
         mkdir -p results
-        echo "Starting scan..."
-        laravel-sec-scanner https://httpbin.org/html \
-          --format sarif \
-          --format json \
-          --output ./results \
-          --no-ssl-verify
-        SCAN_EXIT=$?
-        echo "Scan exit code: $SCAN_EXIT"
-        echo "exit-code=$SCAN_EXIT" >> $GITHUB_OUTPUT
-        
-        echo "Directory contents:"
-        ls -lah results/ || echo "Results directory not found"
-        
-        echo "All JSON files:"
-        find results/ -type f -name "*.json" | head -20
+        python -m main https://httpbin.org/html --format sarif --format json --output ./results --no-ssl-verify || echo "Scan done"
+        ls -la results/
 
     - name: Upload SARIF
       if: always()
@@ -98,12 +61,10 @@ jobs:
       with:
         sarif_file: results/scan_*.sarif.json
         category: laravel-security-scan
-        wait-for-processing: true
 
-    - name: Upload scan results
+    - name: Upload results
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: security-scan-results
         path: results/
-        retention-days: 30

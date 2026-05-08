@@ -39,7 +39,7 @@ jobs:
       - name: Run scan
         run: |
           mkdir -p results
-          laravel-sec-scanner "$TARGET_URL" --format sarif --format json --output ./results --fail-on medium --no-ssl-verify || echo "Scan completed with warnings"
+          python -m main "$TARGET_URL" --format sarif --format json --output ./results --fail-on medium --no-ssl-verify || echo "Scan completed"
           ls -la results/
 
       - name: Upload SARIF
