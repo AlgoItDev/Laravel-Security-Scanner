@@ -93,7 +93,7 @@ laravel-security-scanner/
 │       └── test_composer_lock_cve.py
 ├── .github/
 │   └── workflows/
-│       └── ci.yml               # GitHub Actions CI/CD
+│       └── security.yml         # GitHub Actions Security Scan
 ├── logs/
 ├── reports/
 ├── cve_database.json            # Local CVE database for composer scan
@@ -172,7 +172,7 @@ laravel-sec-scanner https://app.com --cache-ttl 168
 - **OSV API Integration**: Hybrid CVE scanning (local database + OSV.dev API)
 - **Multiple Output Formats**: Console, JSON, TXT, HTML, and SARIF reports
 - **Progress Bar**: Real-time progress tracking with rich library during scans
-- **CI/CD Integration**: GitHub Actions workflow included (`.github/workflows/ci.yml`)
+- **CI/CD Integration**: GitHub Actions workflow included (`.github/workflows/security.yml`)
 - **Async Scanning**: Concurrent checks for faster results
 - **Comprehensive Checks**: 22 security checks covering critical Laravel vulnerabilities
 - **SARIF Support**: SARIF format output for GitHub Security tab integration

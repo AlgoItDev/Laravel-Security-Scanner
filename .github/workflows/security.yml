@@ -38,6 +38,11 @@ jobs:
       security-events: write
       contents: read
 
+    outputs:
+      critical-found: ${{ steps.scan.outputs.critical-found }}
+      high-found: ${{ steps.scan.outputs.high-found }}
+      exit-code: ${{ steps.scan.outputs.exit-code }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -54,11 +59,29 @@ jobs:
       - name: Run security scan
         id: scan
         run: |
+          # Set default values
+          echo "CRITICAL_FOUND=0" >> $GITHUB_OUTPUT
+          echo "HIGH_FOUND=0" >> $GITHUB_OUTPUT
+          
+          # Run scan and capture exit code
           laravel-sec-scanner "${{ env.TARGET_URL }}" \
             --format sarif \
             --output ./results \
             --fail-on ${{ env.FAIL_ON }} \
-            --no-ssl-verify || true
+            --no-ssl-verify
+          EXIT_CODE=$?
+          echo "exit-code=$EXIT_CODE" >> $GITHUB_OUTPUT
+          
+          # Parse JSON results if available
+          if [ -f ./results/*.json ]; then
+            CRITICAL=$(cat ./results/*.json | jq -r '.critical_count // 0')
+            HIGH=$(cat ./results/*.json | jq -r '.high_count // 0')
+            echo "CRITICAL_FOUND=$CRITICAL" >> $GITHUB_OUTPUT
+            echo "HIGH_FOUND=$HIGH" >> $GITHUB_OUTPUT
+          fi
+          
+          # Show exit code
+          echo "Scan exit code: $EXIT_CODE"
 
       - name: Upload SARIF to GitHub Security
         if: success() || failure()
@@ -67,25 +90,14 @@ jobs:
           sarif_file: results/*.sarif
           category: laravel-security-scan
 
-      - name: Upload JSON report
+      - name: Upload report artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: security-report-json
-          path: results/*.json
+          name: security-report
+          path: |
+            results/*
           retention-days: 30
-
-      - name: Check for critical findings
-        if: ${{ env.FAIL_ON == 'critical' && needs.security-scan.outputs.critical-found }}
-        run: |
-          echo "VULNERABILITIES FOUND"
-          exit 1
-
-      - name: Parse results for exit code
-        id: results
-        run: |
-          echo "critical-found=${{ env.CRITICAL_FOUND }}" >> $GITHUB_OUTPUT
-          echo "high-found=${{ env.HIGH_FOUND }}" >> $GITHUB_OUTPUT
 
   report:
     needs: security-scan
@@ -96,17 +108,24 @@ jobs:
       - name: Download reports
         uses: actions/download-artifact@v4
         with:
-          pattern: security-report-*
+          name: security-report
           path: reports
-          merge-multiple: true
 
       - name: Summary
         run: |
-          echo "## Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "## 🔒 Laravel Security Scan Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Target:** ${{ env.TARGET_URL }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Fail on:** ${{ env.FAIL_ON }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
           if [ -f reports/*.json ]; then
-            cat reports/*.json | jq -r '.findings[] | "\(.severity): \(.title)"' >> $GITHUB_STEP_SUMMARY || true
+            echo "### Findings" >> $GITHUB_STEP_SUMMARY
+            cat reports/*.json | jq -r '.findings[] | "- **\(.severity)**: \(.title)"' 2>/dev/null || true
           fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Exit code: ${{ needs.security-scan.outputs.exit-code }}" >> $GITHUB_STEP_SUMMARY
 
   # Optional: Add Jira issue on critical
   create-jira-issue:
