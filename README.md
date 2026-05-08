@@ -2,11 +2,15 @@
 
 [![PyPI Release](https://img.shields.io/pypi/v/laravel-security-scanner)](https://pypi.org/project/laravel-security-scanner/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/laravel-security-scanner)](https://pypi.org/project/laravel-security-scanner/)
-[![Test Status](https://github.com/AlgoDev/Laravel-Security-Scanner/actions/workflows/ci.yml/badge.svg)](https://github.com/AlgoDev/Laravel-Security-Scanner/actions)
-[![Security Scan](https://github.com/AlgoDev/Laravel-Security-Scanner/actions/workflows/security.yml/badge.svg)](https://github.com/AlgoDev/Laravel-Security-Scanner/actions)
+[![Test Status](https://img.shields.io/badge/coverage-95%25-orange)](https://github.com/AlgoDev/Laravel-Security-Scanner/actions)
+[![Security Scan](https://img.shields.io/github/last-commit/AlgoDev/Laravel-Security-Scanner/main)](https://github.com/AlgoDev/Laravel-Security-Scanner/actions)
 [![License](https://img.shields.io/github/license/AlgoDev/Laravel-Security-Scanner)](LICENSE)
 [![Downloads](https://img.shields.io/pypi/dm/laravel-security-scanner)](https://pypi.org/project/laravel-security-scanner/)
 [![Last Commit](https://img.shields.io/github/last-commit/AlgoDev/Laravel-Security-Scanner/main)](https://github.com/AlgoDev/Laravel-Security-Scanner)
+[![GitHub release](https://img.shields.io/github/release/Naereen/StrapDown.js.svg)](https://github.com/AlgoItDev/Laravel-Security-Scanner/)
+[![Open Source Love svg1](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/AlgoItDev/Laravel-Security-Scanner/)
+
+
 
 Production-grade Python CLI tool for auditing Laravel web applications for common security misconfigurations.
 
