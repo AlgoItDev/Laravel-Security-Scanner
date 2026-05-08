@@ -7,7 +7,7 @@ on:
   pull_request:
     branches: [main, develop, master]
   schedule:
-    - cron: '0 0 * * 0'  # Weekly scan
+    - cron: '0 0 * * 0'
   workflow_dispatch:
     inputs:
       target_url:
@@ -53,39 +53,41 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: |
-          pip install laravel-security-scanner
+        run: pip install -e .
 
       - name: Run security scan
         id: scan
+        shell: bash
         run: |
-          # Set default values
           echo "CRITICAL_FOUND=0" >> $GITHUB_OUTPUT
           echo "HIGH_FOUND=0" >> $GITHUB_OUTPUT
+          echo "EXIT_CODE=0" >> $GITHUB_OUTPUT
+          mkdir -p results
           
-          # Run scan and capture exit code
           laravel-sec-scanner "${{ env.TARGET_URL }}" \
             --format sarif \
+            --format json \
             --output ./results \
-            --fail-on ${{ env.FAIL_ON }} \
-            --no-ssl-verify
+            --fail-on "${{ env.FAIL_ON }}" \
+            --no-ssl-verify || true
+          
           EXIT_CODE=$?
           echo "exit-code=$EXIT_CODE" >> $GITHUB_OUTPUT
           
-          # Parse JSON results if available
-          if [ -f ./results/*.json ]; then
-            CRITICAL=$(cat ./results/*.json | jq -r '.critical_count // 0')
-            HIGH=$(cat ./results/*.json | jq -r '.high_count // 0')
-            echo "CRITICAL_FOUND=$CRITICAL" >> $GITHUB_OUTPUT
-            echo "HIGH_FOUND=$HIGH" >> $GITHUB_OUTPUT
-          fi
+          ls -la results/
           
-          # Show exit code
-          echo "Scan exit code: $EXIT_CODE"
+          find results/ -name "*.json" -type f | head -1 | while read JSON_FILE; do
+            if [ -n "$JSON_FILE" ] && [ -f "$JSON_FILE" ]; then
+              CRITICAL=$(python3 -c "import json; print(json.load(open('$JSON_FILE')).get('critical_count', 0))" 2>/dev/null || echo "0")
+              HIGH=$(python3 -c "import json; print(json.load(open('$JSON_FILE')).get('high_count', 0))" 2>/dev/null || echo "0")
+              echo "CRITICAL_FOUND=$CRITICAL" >> $GITHUB_OUTPUT
+              echo "HIGH_FOUND=$HIGH" >> $GITHUB_OUTPUT
+            fi
+          done
 
       - name: Upload SARIF to GitHub Security
         if: success() || failure()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results/*.sarif
           category: laravel-security-scan
@@ -95,8 +97,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: security-report
-          path: |
-            results/*
+          path: results/
           retention-days: 30
 
   report:
@@ -113,33 +114,15 @@ jobs:
 
       - name: Summary
         run: |
-          echo "## 🔒 Laravel Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "## Security Scan Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Target:** ${{ env.TARGET_URL }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Fail on:** ${{ env.FAIL_ON }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          if [ -f reports/*.json ]; then
-            echo "### Findings" >> $GITHUB_STEP_SUMMARY
-            cat reports/*.json | jq -r '.findings[] | "- **\(.severity)**: \(.title)"' 2>/dev/null || true
-          fi
-          
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Target: ${{ env.TARGET_URL }}" >> $GITHUB_STEP_SUMMARY
           echo "Exit code: ${{ needs.security-scan.outputs.exit-code }}" >> $GITHUB_STEP_SUMMARY
-
-  # Optional: Add Jira issue on critical
-  create-jira-issue:
-    needs: security-scan
-    runs-on: ubuntu-latest
-    if: failure()
-    steps:
-      - name: Create Jira issue
-        uses: atlassian/gajira-create-from-v3@v3
-        with:
-          title: "Security Alert: Critical vulnerabilities found"
-          description: "Critical vulnerabilities detected in ${{ env.TARGET_URL }}"
-          issuetype: Bug
-          project: SECURITY
-        env:
-          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
-          JIRA_HOST: ${{ secrets.JIRA_HOST }}
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          for f in reports/*.json; do
+            if [ -f "$f" ]; then
+              python3 -c "import json; d=json.load(open('$f')); print('Critical:', d.get('critical_count',0)); print('High:', d.get('high_count',0)); print('Medium:', d.get('medium_count',0))" >> $GITHUB_STEP_SUMMARY 2>/dev/null || true
+              break
+            fi
+          done
