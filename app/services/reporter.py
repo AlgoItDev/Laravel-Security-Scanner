@@ -35,6 +35,69 @@ BOLD  = "\033[1m"
 class ReportService:
     """Generates reports from ScanResult objects."""
 
+    # ── Helper Methods ───────────────────────────────────────────────────────────
+
+    def _print_security_score(self, result: ScanResult) -> None:
+        """Print security score with grade."""
+        from app.models.score import Grade, RiskLevel
+        from app.services.score_calculator import calculate_security_score
+
+        score = calculate_security_score(result)
+
+        # Color for score
+        if score.grade == Grade.APLUS:
+            color = "\033[92m"  # green
+        elif score.grade in (Grade.A, Grade.BPLUS, Grade.B):
+            color = "\033[93m"  # yellow
+        elif score.grade == Grade.C:
+            color = "\033[33m"  # orange/yellow
+        else:
+            color = "\033[91m"  # red
+
+        print(f"  Security Score : {BOLD}{score.overall_score}/100{RESET} {color}[{score.grade.value}]{RESET}")
+        print(f"  Risk Level      : {score.risk_level.value.upper()}")
+
+        # Category breakdown
+        print()
+        categories = self._get_category_display_lines(score)
+        for line in categories:
+            print(f"  {line}")
+
+    def _get_category_display_lines(self, score_obj) -> list[str]:
+        """Get category score display lines."""
+        from app.models.score import Category, Grade
+
+        lines = []
+        grade_colors = {
+            Grade.APLUS: "\033[92m",  # green
+            Grade.A: "\033[92m",
+            Grade.BPLUS: "\033[93m",  # yellow
+            Grade.B: "\033[93m",
+            Grade.C: "\033[33m",  # orange
+            Grade.D: "\033[91m",  # red
+            Grade.F: "\033[91m",
+        }
+
+        for cat_score in score_obj.categories:
+            if cat_score.findings_count == 0:
+                continue
+
+            cat_name = cat_score.category.value.upper()
+            bar = self._make_bar(cat_score.score)
+            color = grade_colors.get(cat_score.grade, "")
+
+            lines.append(
+                f"{cat_name:10} {bar} {cat_score.score}/100 {color}[{cat_score.letter_grade}]{RESET}"
+            )
+
+        return lines
+
+    def _make_bar(self, score: int, width: int = 12) -> str:
+        """Make a progress bar string."""
+        filled = "█" * int(score / 100 * width)
+        empty = "░" * (width - len(filled))
+        return f"{filled}{empty}"
+
     # ── Console ───────────────────────────────────────────────────────────
 
     def print_console(self, result: ScanResult) -> None:
@@ -43,10 +106,13 @@ class ReportService:
         print(f"\n{BOLD}{bar}{RESET}")
         print(f"{BOLD}  Laravel Security Scanner - Scan Report{RESET}")
         print(bar)
-        print(f"  Target     : {result.target.url}")
-        print(f"  Scanned at : {result.started_at.strftime('%Y-%m-%d %H:%M:%S UTC')}")
-        print(f"  Duration   : {self._duration(result):.2f}s")
-        print(f"  Risk Score : {BOLD}{result.risk_score} / 10{RESET}")
+        print(f"  Target      : {result.target.url}")
+        print(f"  Scanned at  : {result.started_at.strftime('%Y-%m-%d %H:%M:%S UTC')}")
+        print(f"  Duration    : {self._duration(result):.2f}s")
+
+        # Security Score
+        self._print_security_score(result)
+
         print(bar)
 
         if result.error:
@@ -98,7 +164,12 @@ class ReportService:
         filename = f"scan_{self._slug(result.target.url)}_{self._ts()}.json"
         path = out_dir / filename
 
+        # Add security score to payload
+        from app.services.score_calculator import calculate_security_score
+
         payload = result.model_dump(mode="json")
+        payload["security_score"] = calculate_security_score(result).to_dict()
+
         path.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
 
         logger.info(f"JSON report saved: {path}")

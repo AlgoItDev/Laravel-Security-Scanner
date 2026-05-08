@@ -80,8 +80,19 @@ class ScanResult(BaseModel):
         return [f for f in self.findings if f.status == CheckStatus.VULNERABLE]
 
     @property
+    def security_score(self) -> int:
+        """Security score 0-100 based on findings."""
+        from app.services.score_calculator import calculate_security_score
+
+        if not self.findings:
+            return 100
+
+        score = calculate_security_score(self)
+        return score.overall_score
+
+    @property
     def risk_score(self) -> float:
-        """Weighted risk score 0–10."""
+        """Weighted risk score 0-10."""
         weights = {
             Severity.CRITICAL: 10.0,
             Severity.HIGH: 7.0,

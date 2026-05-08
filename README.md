@@ -256,6 +256,56 @@ This tool uses **hybrid static + dynamic analysis** to minimize false positives:
    - Dynamic VULN only = **40%** confidence (WAF bypass possible)
    - No findings = **SAFE**
 
+## Security Score System
+
+This tool provides a **comprehensive security score** (0-100) based on findings:
+
+### Categories
+
+| Category | Checks | Weight |
+|-----------|--------|--------|
+| Config | ENV_EXPOSED, DEBUG_MODE, LARAVEL_VERSION, SENSITIVE_FILES | 1.2x |
+| Auth | CSRF_PROTECTION, SESSION_SECURITY, RATE_LIMITING | 2.0x |
+| Headers | SECURITY_HEADERS, CORS_MISCONFIG | 1.0x |
+| Secrets | COMPOSER_CVE, JWT_ANALYSIS, SUBDOMAIN_ENUM | 1.5x |
+| Database | SQL_INJECTION | 2.0x |
+| Input | XSS, OPEN_REDIRECT | 1.5x |
+
+### Scoring Formula
+
+```
+Base: 100 points
+- CRITICAL: -15 points each
+- HIGH: -10 points each
+- MEDIUM: -5 points each
+- LOW: -2 points each
+```
+
+### Grade System
+
+| Score | Grade | Risk Level |
+|-------|-------|------------|
+| 90-100 | A+ | Very Low |
+| 80-89 | A | Low |
+| 70-79 | B+ | Medium-Low |
+| 60-69 | B | Medium |
+| 50-59 | C | Medium-High |
+| 40-49 | D | High |
+| 0-39 | F | Critical |
+
+### Example Output
+
+```
+Security Score : 72/100 [B+]
+Risk Level      : MEDIUM
+
+CONFIG    ████████░░ 80/100 [B+]
+AUTH      ██████████ 100/100 [A+]
+HEADERS   ██████░░░░░ 60/100 [D]
+SECRETS  ██████████ 100/100 [A+]
+DATABASE ████░░░░░░░ 40/100 [F]
+```
+
 ### False Positive Examples
 
 | Code Pattern | Old Behavior | New Behavior |
@@ -315,6 +365,7 @@ Current version: **v1.5.0** (see [VERSION](VERSION) file)
 
 **Total Security Checks**: 22
 **AST-Based Analysis**: True PHP code analysis with taint tracking
+**Security Score**: Category-based 0-100 scoring system with grades
 **Output Formats**: 5 (Console, JSON, TXT, HTML, SARIF)
 **Tests**: 102 passing
 **CI/CD**: GitHub Actions ready

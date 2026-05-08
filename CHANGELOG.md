@@ -8,16 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.5.0] - 2026-05-08
 
 ### Added
+- **Security Score System** (enterprise feature):
+  - Category-based scoring (6 categories):
+    - Config: ENV_EXPOSED, DEBUG_MODE, LARAVEL_VERSION, INSECURE_CONFIG, SENSITIVE_FILES
+    - Auth: CSRF_PROTECTION, SESSION_SECURITY
+    - Headers: SECURITY_HEADERS, CORS_MISCONFIG
+    - Secrets: COMPOSER_CVE, JWT_ANALYSIS
+    - Database: SQL_INJECTION
+    - Input: XSS, OPEN_REDIRECT
+  - Overall score: 0-100 weighted average
+  - Grade system: A+ to F
+  - Risk level: Very Low to Critical
+  - Console output with progress bars
+  - JSON output includes full score breakdown
+  - Ceza sistemsi (CRITICAL:-15, HIGH:-10, MEDIUM:-5, LOW:-2)
+
 - **PHP AST Parser (phply)** - True static code analysis:
   - Uses phply (pure Python PHP parser) - no PHP runtime required
   - Parses PHP code into Abstract Syntax Tree
   - Analyzes code structure, NOT just regex patterns
-
-- **`PHPASTAnalyzer`** - Advanced AST-based analyzer:
-  - **Taint Tracking**: Tracks data flow from source to sink
-  - **Dangerous Function Detection**:
-    - SQL Injection, Command Injection, Deserialization, File Inclusion
-  - 90-98% confidence scoring
+  - Taint Tracking: Tracks data flow from source to sink
+  - Dangerous Function Detection
 
 - **CI/CD Integration**:
   - **GitHub Actions Workflow** (`.github/workflows/security.yml`):
