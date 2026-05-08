@@ -17,7 +17,7 @@ class Settings(BaseSettings):
 
     # App
     APP_NAME: str = "Laravel Security Scanner"
-    APP_VERSION: str = "1.3.0"
+    APP_VERSION: str = "1.5.0"
     DEBUG: bool = False
 
     # Scanner Behaviour

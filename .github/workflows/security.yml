@@ -1,0 +1,126 @@
+name: Laravel Security Scan
+
+on:
+  push:
+    branches: [main, develop, master]
+    tags: ['v*']
+  pull_request:
+    branches: [main, develop, master]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly scan
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Target URL to scan'
+        required: true
+        type: string
+      fail_on:
+        description: 'Fail on severity level'
+        required: false
+        type: choice
+        default: medium
+        options:
+          - critical
+          - high
+          - medium
+          - low
+          - info
+          - none
+
+env:
+  TARGET_URL: ${{ vars.TARGET_URL || github.event.inputs.target_url || 'https://example.com' }}
+  FAIL_ON: ${{ vars.FAIL_ON || github.event.inputs.fail_on || 'medium' }}
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install laravel-security-scanner
+
+      - name: Run security scan
+        id: scan
+        run: |
+          laravel-sec-scanner "${{ env.TARGET_URL }}" \
+            --format sarif \
+            --output ./results \
+            --fail-on ${{ env.FAIL_ON }} \
+            --no-ssl-verify || true
+
+      - name: Upload SARIF to GitHub Security
+        if: success() || failure()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results/*.sarif
+          category: laravel-security-scan
+
+      - name: Upload JSON report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report-json
+          path: results/*.json
+          retention-days: 30
+
+      - name: Check for critical findings
+        if: ${{ env.FAIL_ON == 'critical' && needs.security-scan.outputs.critical-found }}
+        run: |
+          echo "VULNERABILITIES FOUND"
+          exit 1
+
+      - name: Parse results for exit code
+        id: results
+        run: |
+          echo "critical-found=${{ env.CRITICAL_FOUND }}" >> $GITHUB_OUTPUT
+          echo "high-found=${{ env.HIGH_FOUND }}" >> $GITHUB_OUTPUT
+
+  report:
+    needs: security-scan
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Download reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: security-report-*
+          path: reports
+          merge-multiple: true
+
+      - name: Summary
+        run: |
+          echo "## Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f reports/*.json ]; then
+            cat reports/*.json | jq -r '.findings[] | "\(.severity): \(.title)"' >> $GITHUB_STEP_SUMMARY || true
+          fi
+
+  # Optional: Add Jira issue on critical
+  create-jira-issue:
+    needs: security-scan
+    runs-on: ubuntu-latest
+    if: failure() && env.JIRA_TOKEN
+    steps:
+      - name: Create Jira issue
+        uses: atlassian/gajira-create-from-v3@v3
+        with:
+          title: "Security Alert: Critical vulnerabilities found"
+          description: "Critical vulnerabilities detected in ${{ env.TARGET_URL }}"
+          issuetype: Bug
+          project: SECURITY
+        env:
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+          JIRA_HOST: ${{ secrets.JIRA_HOST }}

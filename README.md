@@ -179,6 +179,8 @@ laravel-sec-scanner https://app.com --cache-ttl 168
 - **Connection Pooling**: HTTP connection reuse for better performance
 - **Check Selection**: Use `--checks` to run specific checks only
 - **OSV Cache**: File-based cache with configurable TTL for offline scanning
+- **Progressive Exit Codes**: 0-4 based on severity for CI/CD pipelines
+- **Fail-on Threshold**: `--fail-on critical` for GitHub Actions integration
 
 ## Running Tests
 
@@ -275,10 +277,31 @@ That's it — the `ScannerService` picks it up automatically.
 
 | Code | Meaning |
 |---|---|
-| `0` | All targets clean |
-| `1` | One or more vulnerabilities found |
+| `0` | Clean - no vulnerabilities found |
+| `1` | Low/Info vulnerabilities found |
+| `2` | Medium vulnerabilities found |
+| `3` | High vulnerabilities found |
+| `4` | Critical vulnerabilities found |
+| `5` | Scan error or failure |
 
-Useful for CI/CD pipelines: `laravel-sec-scanner https://app.com || echo "Security issues found!"`
+### CI/CD Usage
+
+```bash
+# Basic usage - exit 1 if ANY vulnerability
+laravel-sec-scanner https://app.com
+
+# Fail on critical only
+laravel-sec-scanner https://app.com --fail-on critical
+
+# Fail on high or above
+laravel-sec-scanner https://app.com --fail-on high
+```
+
+GitHub Actions example:
+```yaml
+- name: Security Scan
+  run: laravel-sec-scanner ${{ vars.TARGET_URL }} --fail-on critical
+```
 
 ## Changelog
 

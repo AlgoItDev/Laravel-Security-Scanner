@@ -15,6 +15,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **`PHPASTAnalyzer`** - Advanced AST-based analyzer:
   - **Taint Tracking**: Tracks data flow from source to sink
+  - **Dangerous Function Detection**:
+    - SQL Injection, Command Injection, Deserialization, File Inclusion
+  - 90-98% confidence scoring
+
+- **CI/CD Integration**:
+  - **GitHub Actions Workflow** (`.github/workflows/security.yml`):
+    - SARIF upload to GitHub Security tab
+    - Artifact upload for reports
+    - Manual trigger with `workflow_dispatch`
+    - Weekly scheduled scans
+    - Optional Jira integration
+
+  - **Progressive Exit Codes**:
+    ```
+    0 = Clean (no vulnerabilities)
+    1 = Low/Info vulnerabilities found
+    2 = Medium vulnerabilities found
+    3 = High vulnerabilities found
+    4 = Critical vulnerabilities found
+    5 = Scan error/failure
+    ```
+
+  - **CLI Options**:
+    - `--fail-on {critical|high|medium|low|info|none}` - Exit code threshold
+    - `--min-severity {CRITICAL|HIGH|MEDIUM|LOW|INFO}` - Filter findings
+
+- **Dependencies**:
+  - phply>=1.2.0 (pure Python PHP parser)
+
+### Added
+- **PHP AST Parser (phply)** - True static code analysis:
+  - Uses phply (pure Python PHP parser) - no PHP runtime required
+  - Parses PHP code into Abstract Syntax Tree
+  - Analyzes code structure, NOT just regex patterns
+
+- **`PHPASTAnalyzer`** - Advanced AST-based analyzer:
+  - **Taint Tracking**: Tracks data flow from source to sink
     - `$_GET['id']` → $id (source becomes tainted)
     - $query = "..." . $id (propagation)
     - DB::select($query) (sink = VULNERABLE!)
