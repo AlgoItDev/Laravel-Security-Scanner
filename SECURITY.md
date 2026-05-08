@@ -2,20 +2,56 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
-
 | Version | Supported          |
 | ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| 1.6.x   | :white_check_mark: |
+| 1.5.x   | :white_check_mark: |
+| < 1.5   | :x:                |
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+If you discover a security vulnerability in Laravel Security Scanner, please report it responsibly.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+### How to Report
+
+1. **Do NOT** open a public GitHub issue for security vulnerabilities
+2. Email: bug@algoit.co.uk
+3. Include as much detail as possible:
+   - Description of the vulnerability
+   - Steps to reproduce
+   - Potential impact
+   - Any suggested fixes (optional)
+
+### Response Timeline
+
+- **Acknowledge**: Within 48 hours
+- **Initial Assessment**: Within 7 days
+- **Fix Timeline**: Depending on severity
+  - Critical: 24-72 hours
+  - High: 7-14 days
+  - Medium/Low: Next release cycle
+
+### Scope
+
+This security policy applies to:
+- The scanner core functionality
+- CI/CD integration
+- Report generation (JSON, HTML, SARIF)
+- AST analysis engine
+
+### Out of Scope
+
+- Third-party dependencies (report to upstream maintainers)
+- User-scanned applications
+- Misuse of the scanner tool
+
+## Security Updates
+
+Security fixes are released as patch versions and announced in:
+- GitHub Releases
+- CHANGELOG.md
+- PyPI release notes
+
+## Vulnerability Disclosure
+
+We follow coordinated disclosure practices. Please give us reasonable time to issue a fix before public disclosure.
