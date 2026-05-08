@@ -131,7 +131,7 @@ jobs:
   create-jira-issue:
     needs: security-scan
     runs-on: ubuntu-latest
-    if: failure() && env.JIRA_TOKEN
+    if: failure()
     steps:
       - name: Create Jira issue
         uses: atlassian/gajira-create-from-v3@v3
