@@ -89,7 +89,7 @@ jobs:
         if: success() || failure()
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: results/*.sarif.json
+          sarif_file: results/scan_*.sarif.json
           category: laravel-security-scan
 
       - name: Upload report artifacts
