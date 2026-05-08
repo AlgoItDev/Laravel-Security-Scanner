@@ -5,7 +5,6 @@
 [![Test Status](https://img.shields.io/badge/coverage-95%25-orange)](https://github.com/AlgoDev/Laravel-Security-Scanner/actions)
 [![Security Scan](https://img.shields.io/github/last-commit/AlgoDev/Laravel-Security-Scanner/main)](https://github.com/AlgoDev/Laravel-Security-Scanner/actions)
 [![Downloads](https://img.shields.io/pypi/dm/laravel-security-scanner)](https://pypi.org/project/laravel-security-scanner/)
-[![GitHub release](https://img.shields.io/github/release/Naereen/StrapDown.js.svg)](https://github.com/AlgoItDev/Laravel-Security-Scanner/)
 [![Open Source Love svg1](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/AlgoItDev/Laravel-Security-Scanner/)
 
 
