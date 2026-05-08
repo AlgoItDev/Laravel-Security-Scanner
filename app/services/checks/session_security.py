@@ -3,7 +3,7 @@ Check: Session security configuration.
 
 Laravel session security checks:
 - Secure cookie flag
-- HttpOnly flag  
+- HttpOnly flag
 - SameSite attribute
 - Session cookie name (should not be default)
 Severity: MEDIUM to HIGH
@@ -21,60 +21,45 @@ class SessionSecurityCheck(BaseCheck):
     TITLE = "Session Security Configuration"
 
     async def run(self, target: ScanTarget) -> Finding:
-        """
-        Check session cookie security settings.
-        """
         issues = []
         evidence_details = []
-        
+
         try:
             resp = await self._client.get(
                 target.url,
                 headers=target.headers,
                 follow_redirects=True,
             )
-            
-            # Get session cookie
-            session_cookie = None
-            for cookie in resp.cookies:
-                # Laravel default session cookie names
-                if cookie.name in ['laravel_session', 'session', 'PHPSESSID']:
-                    session_cookie = cookie
+
+            session_cookie_name = None
+            for name in resp.cookies.keys():
+                if name in ['laravel_session', 'session', 'PHPSESSID']:
+                    session_cookie_name = name
                     break
-            
-            if not session_cookie and 'Set-Cookie' in resp.headers:
-                # Try to find from header
-                set_cookie = resp.headers['Set-Cookie']
-                if 'laravel_session' in set_cookie or 'session' in set_cookie:
-                    # Parse cookie attributes from header
-                    if 'secure' not in set_cookie.lower():
-                        issues.append("Session cookie missing Secure flag")
-                        evidence_details.append("Set-Cookie header missing 'secure' flag")
-                    if 'httponly' not in set_cookie.lower():
-                        issues.append("Session cookie missing HttpOnly flag")
-                        evidence_details.append("Set-Cookie header missing 'httponly' flag")
-                    if 'samesite' not in set_cookie.lower():
-                        issues.append("Session cookie missing SameSite attribute")
-                        evidence_details.append("Set-Cookie header missing 'samesite' attribute")
-            elif session_cookie:
-                # Check cookie attributes (httpx cookie object)
-                if not session_cookie.secure:
+
+            set_cookie_header = resp.headers.get('Set-Cookie', '')
+
+            if session_cookie_name and set_cookie_header:
+                if 'secure' not in set_cookie_header.lower():
                     issues.append("Session cookie missing Secure flag")
-                    evidence_details.append(f"Cookie '{session_cookie.name}' has Secure=False")
-                
-                # httpx cookies don't expose HttpOnly/SameSite directly
-                # Check via Set-Cookie header
-                if 'Set-Cookie' in resp.headers:
-                    set_cookie = resp.headers['Set-Cookie']
-                    if 'httponly' not in set_cookie.lower():
-                        issues.append("Session cookie missing HttpOnly flag")
-                        evidence_details.append("HttpOnly flag not set")
-                    if 'samesite' not in set_cookie.lower():
-                        issues.append("Session cookie missing SameSite attribute")
-                        evidence_details.append("SameSite attribute not set")
+                    evidence_details.append("Set-Cookie header missing 'secure' flag")
+                if 'httponly' not in set_cookie_header.lower():
+                    issues.append("Session cookie missing HttpOnly flag")
+                    evidence_details.append("Set-Cookie header missing 'httponly' flag")
+                if 'samesite' not in set_cookie_header.lower():
+                    issues.append("Session cookie missing SameSite attribute")
+                    evidence_details.append("Set-Cookie header missing 'samesite' attribute")
+            elif set_cookie_header and ('laravel_session' in set_cookie_header or 'session' in set_cookie_header):
+                if 'secure' not in set_cookie_header.lower():
+                    issues.append("Session cookie missing Secure flag")
+                    evidence_details.append("Set-Cookie header missing 'secure' flag")
+                if 'httponly' not in set_cookie_header.lower():
+                    issues.append("Session cookie missing HttpOnly flag")
+                    evidence_details.append("Set-Cookie header missing 'httponly' flag")
+                if 'samesite' not in set_cookie_header.lower():
+                    issues.append("Session cookie missing SameSite attribute")
+                    evidence_details.append("Set-Cookie header missing 'samesite' attribute")
             else:
-                # No session cookie found - might be using token-based auth
-                # Check if session driver is file-based (insecure)
                 return Finding(
                     check_id=self.CHECK_ID,
                     title=self.TITLE,
@@ -82,8 +67,7 @@ class SessionSecurityCheck(BaseCheck):
                     status=CheckStatus.SAFE,
                     description="No session cookie detected - might be using token-based authentication.",
                 )
-            
-            # Determine severity
+
             if len(issues) >= 3:
                 severity = Severity.HIGH
                 status = CheckStatus.VULNERABLE
@@ -98,7 +82,7 @@ class SessionSecurityCheck(BaseCheck):
                     status=CheckStatus.SAFE,
                     description="Session security appears properly configured.",
                 )
-            
+
             return Finding(
                 check_id=self.CHECK_ID,
                 title=self.TITLE,
@@ -124,7 +108,7 @@ class SessionSecurityCheck(BaseCheck):
                     "https://owasp.org/www-project-top-ten/2017/A5_2017-Broken_Access_Control",
                 ],
             )
-            
+
         except httpx.TimeoutException:
             logger.warning(f"[{self.CHECK_ID}] Timeout for {target.url}")
             return Finding(

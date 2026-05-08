@@ -10,7 +10,7 @@ from app.services.checks.csrf_protection import CSRFProtectionCheck
 
 def _make_client(responses: dict[str, tuple[int, str]]) -> httpx.AsyncClient:
     """Build an AsyncClient with a custom transport that returns canned responses."""
-    
+
     class MockTransport(httpx.AsyncBaseTransport):
         async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
             url_str = str(request.url)
@@ -18,7 +18,7 @@ def _make_client(responses: dict[str, tuple[int, str]]) -> httpx.AsyncClient:
                 if pattern in url_str:
                     return httpx.Response(status, text=body)
             return httpx.Response(404, text="Not Found")
-    
+
     return httpx.AsyncClient(transport=MockTransport())
 
 
@@ -34,18 +34,19 @@ class TestCSRFProtectionCheck:
         </form>
         </html>
         """
-        client = _make_client({"/": (200, body)})
+        client = _make_client({"example.com": (200, body)})
         check = CSRFProtectionCheck(client)
         finding = await check.run(ScanTarget(url="https://example.com"))
-        
+
         assert finding.status == CheckStatus.VULNERABLE
         assert finding.severity == Severity.HIGH
         assert "csrf" in finding.description.lower() or "form" in finding.description.lower()
 
     async def test_safe_when_forms_have_tokens(self):
-        """Test safe when forms have CSRF tokens."""
+        """Test safe when forms have CSRF tokens and meta tag."""
         body = """
         <html>
+        <meta name="csrf-token" content="abc123">
         <form method="POST" action="/submit">
             <input type="hidden" name="_token" value="abc123">
             <input type="text" name="name">
@@ -53,10 +54,10 @@ class TestCSRFProtectionCheck:
         </form>
         </html>
         """
-        client = _make_client({"/": (200, body)})
+        client = _make_client({"example.com": (200, body)})
         check = CSRFProtectionCheck(client)
         finding = await check.run(ScanTarget(url="https://example.com"))
-        
+
         assert finding.status == CheckStatus.SAFE
 
     async def test_safe_when_only_get_forms(self):
@@ -69,10 +70,10 @@ class TestCSRFProtectionCheck:
         </form>
         </html>
         """
-        client = _make_client({"/": (200, body)})
+        client = _make_client({"example.com": (200, body)})
         check = CSRFProtectionCheck(client)
         finding = await check.run(ScanTarget(url="https://example.com"))
-        
+
         assert finding.status == CheckStatus.SAFE
 
     async def test_handles_timeout(self):
@@ -80,9 +81,9 @@ class TestCSRFProtectionCheck:
         class TimeoutTransport(httpx.AsyncBaseTransport):
             async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
                 raise httpx.TimeoutException("Timeout")
-        
+
         client = httpx.AsyncClient(transport=TimeoutTransport())
         check = CSRFProtectionCheck(client)
         finding = await check.run(ScanTarget(url="https://example.com"))
-        
+
         assert finding.status in (CheckStatus.SAFE, CheckStatus.UNKNOWN, CheckStatus.SKIPPED)

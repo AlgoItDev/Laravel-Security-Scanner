@@ -1,39 +1,35 @@
-# 🔍 Laravel Security Scanner
-
-[![PyPI Version](https://img.shields.io/pypi/v/laravel-security-scanner)](https://pypi.org/project/laravel-security-scanner/)
-[![Python Version](https://img.shields.io/pypi/pyversions/pybadges.svg)](https://pypi.org/project/laravel-security-scanner/)
-[![License: MIT](https://img.shields.io/pypi/l/laravel-security-scanner)](LICENSE)
+# Laravel Security Scanner
 
 Production-grade Python CLI tool for auditing Laravel web applications for common security misconfigurations.
 
-## 🎯 What It Checks
+## What It Checks
 
 | Check ID | Title | Severity |
 |---|---|---|
-| `ENV_EXPOSED` | .env file publicly accessible | 🔴 CRITICAL |
-| `DEBUG_MODE` | Laravel debug mode enabled | 🔴 HIGH |
-| `SENSITIVE_FILES` | Sensitive files/directories exposed | 🔴 HIGH |
-| `SECURITY_HEADERS` | Missing HTTP security headers | 🟠 MEDIUM |
-| `INSECURE_CONFIG` | CORS, cookie flags, server headers | 🟠 MEDIUM |
-| `LARAVEL_VERSION` | Laravel version disclosure | 🟠 MEDIUM |
-| `TELESCOPE_EXPOSED` | Laravel Telescope exposed | 🔴 HIGH |
-| `DEBUGBAR_EXPOSED` | Laravel Debugbar exposed | 🟠 MEDIUM |
-| `MIX_MANIFEST_EXPOSED` | Laravel Mix manifest exposed | 🟢 LOW |
-| `HORIZON_EXPOSED` | Laravel Horizon exposed | 🟠 MEDIUM |
-| `NOVA_EXPOSED` | Laravel Nova exposed | 🔴 HIGH |
-| `CSRF_PROTECTION` | CSRF protection missing | 🔴 HIGH |
-| `SESSION_SECURITY` | Session security configuration | 🟠 MEDIUM |
-| `RATE_LIMITING` | Rate limiting missing | 🟠 MEDIUM |
-| `HTTP_METHODS` | Dangerous HTTP methods enabled | 🟠 MEDIUM |
-| `COMPOSER_CVE` | Composer.lock CVE scan | 🔴 CRITICAL |
-| `SQL_INJECTION_BLIND` | Blind SQL injection vulnerability | 🔴 CRITICAL |
-| `XSS_REFLECTED` | Reflected XSS vulnerability | 🔴 HIGH |
-| `JWT_ANALYSIS` | JWT token security issues | 🔴 HIGH |
-| `CORS_MISCONFIG` | CORS misconfiguration | 🟠 MEDIUM |
-| `OPEN_REDIRECT` | Open redirect vulnerability | 🟠 MEDIUM |
-| `SUBDOMAIN_ENUM` | Subdomain enumeration | 🟢 LOW |
+| `ENV_EXPOSED` | .env file publicly accessible | CRITICAL |
+| `DEBUG_MODE` | Laravel debug mode enabled | HIGH |
+| `SENSITIVE_FILES` | Sensitive files/directories exposed | HIGH |
+| `SECURITY_HEADERS` | Missing HTTP security headers | MEDIUM |
+| `INSECURE_CONFIG` | CORS, cookie flags, server headers | MEDIUM |
+| `LARAVEL_VERSION` | Laravel version disclosure | MEDIUM |
+| `TELESCOPE_EXPOSED` | Laravel Telescope exposed | HIGH |
+| `DEBUGBAR_EXPOSED` | Laravel Debugbar exposed | MEDIUM |
+| `MIX_MANIFEST_EXPOSED` | Laravel Mix manifest exposed | LOW |
+| `HORIZON_EXPOSED` | Laravel Horizon exposed | MEDIUM |
+| `NOVA_EXPOSED` | Laravel Nova exposed | HIGH |
+| `CSRF_PROTECTION` | CSRF protection missing | HIGH |
+| `SESSION_SECURITY` | Session security configuration | MEDIUM |
+| `RATE_LIMITING` | Rate limiting missing | MEDIUM |
+| `HTTP_METHODS` | Dangerous HTTP methods enabled | MEDIUM |
+| `COMPOSER_CVE` | Composer.lock CVE scan (OSV API + local DB) | CRITICAL |
+| `SQL_INJECTION_BLIND` | Blind SQL injection vulnerability | CRITICAL |
+| `XSS_REFLECTED` | Reflected XSS vulnerability | HIGH |
+| `JWT_ANALYSIS` | JWT token security issues | HIGH |
+| `CORS_MISCONFIG` | CORS misconfiguration | MEDIUM |
+| `OPEN_REDIRECT` | Open redirect vulnerability | MEDIUM |
+| `SUBDOMAIN_ENUM` | Subdomain enumeration | LOW |
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 laravel-security-scanner/
@@ -89,7 +85,8 @@ laravel-security-scanner/
 │       └── ci.yml               # GitHub Actions CI/CD
 ├── logs/
 ├── reports/
-├── cve_database.json            # CVE database for composer scan
+├── cve_database.json            # Local CVE database for composer scan
+├── osv_cache.json               # OSV API cache (auto-generated)
 ├── .env.example
 ├── requirements.txt
 ├── pytest.ini
@@ -98,7 +95,7 @@ laravel-security-scanner/
 └── main.py
 ```
 
-## 🚀 Installation
+## Installation
 
 ### Via PyPI (Recommended)
 
@@ -125,7 +122,7 @@ cp .env.example .env
 # Edit .env as needed
 ```
 
-## 🚀 Usage
+## Usage
 
 ```bash
 # Scan a single target (all formats)
@@ -154,22 +151,27 @@ laravel-sec-scanner https://app.com --timeout 20
 
 # Run specific checks only
 laravel-sec-scanner https://app.com --checks ENV_EXPOSED,DEBUG_MODE,COMPOSER_CVE
+
+# Set OSV cache TTL (default: 24 hours, 0 to disable)
+laravel-sec-scanner https://app.com --cache-ttl 168
 ```
 
-## 🎯 Features
+## Features
 
+- **OSV API Integration**: Hybrid CVE scanning (local database + OSV.dev API)
 - **Multiple Output Formats**: Console, JSON, TXT, HTML, and SARIF reports
 - **Progress Bar**: Real-time progress tracking with rich library during scans
 - **CI/CD Integration**: GitHub Actions workflow included (`.github/workflows/ci.yml`)
 - **Async Scanning**: Concurrent checks for faster results
-- **Comprehensive Checks**: 16 security checks covering critical Laravel vulnerabilities
+- **Comprehensive Checks**: 22 security checks covering critical Laravel vulnerabilities
 - **SARIF Support**: SARIF format output for GitHub Security tab integration
 - **Rate Limiting**: Built-in rate limiter to avoid overwhelming target servers
 - **Retry Mechanism**: Automatic retry for failed requests with exponential backoff
 - **Connection Pooling**: HTTP connection reuse for better performance
 - **Check Selection**: Use `--checks` to run specific checks only
+- **OSV Cache**: File-based cache with configurable TTL for offline scanning
 
-## 🧪 Running Tests
+## Running Tests
 
 ```bash
 # Install dev dependencies
@@ -180,17 +182,17 @@ pytest tests/unit/ -v
 pytest tests/ -v --tb=short   # all tests
 ```
 
-**Current Test Coverage**: 51 tests passing ✅
+**Current Test Coverage**: 100 tests passing
 
-## ➕ Adding a New Check
+## Adding a New Check
 
 1. Create `app/services/checks/my_check.py` extending `BaseCheck`
 2. Implement `async def run(self, target: ScanTarget) -> Finding`
-3. Register in `app/services/checks/__init__.py → ALL_CHECKS`
+3. Register in `app/services/checks/__init__.py -> ALL_CHECKS`
 
 That's it — the `ScannerService` picks it up automatically.
 
-## 📤 Exit Codes
+## Exit Codes
 
 | Code | Meaning |
 |---|---|
@@ -199,17 +201,17 @@ That's it — the `ScannerService` picks it up automatically.
 
 Useful for CI/CD pipelines: `laravel-sec-scanner https://app.com || echo "Security issues found!"`
 
-## 📋 Changelog
+## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
-## 📌 Version
+## Version
 
-Current version: **v1.2.0** (see [VERSION](VERSION) file)
+Current version: **v1.3.0** (see [VERSION](VERSION) file)
 
 ---
 
-**🎯 Total Security Checks**: 22
-**📊 Output Formats**: 5 (Console, JSON, TXT, HTML, SARIF)
-**🧪 Tests**: 60+ passing
-**🚀 CI/CD**: GitHub Actions ready
+**Total Security Checks**: 22
+**Output Formats**: 5 (Console, JSON, TXT, HTML, SARIF)
+**Tests**: 100 passing
+**CI/CD**: GitHub Actions ready

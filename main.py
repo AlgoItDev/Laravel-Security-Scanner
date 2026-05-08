@@ -71,6 +71,13 @@ Examples:
              "By default, all checks are run.",
     )
     parser.add_argument(
+        "--cache-ttl",
+        type=int,
+        default=settings.OSV_CACHE_TTL_HOURS,
+        help=f"OSV cache TTL in hours (default: {settings.OSV_CACHE_TTL_HOURS}). "
+             "Set to 0 to disable cache.",
+    )
+    parser.add_argument(
         "--version",
         action="version",
         version=f"%(prog)s {settings.APP_VERSION}",
@@ -85,7 +92,7 @@ async def run_scans(args: argparse.Namespace) -> int:
     if args.checks:
         check_ids = [check_id.strip() for check_id in args.checks.split(",")]
     
-    scanner = ScannerService(timeout=args.timeout, check_ids=check_ids)
+    scanner = ScannerService(timeout=args.timeout, check_ids=check_ids, cache_ttl=args.cache_ttl)
     reporter = ReportService()
     any_vulnerable = False
 

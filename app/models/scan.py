@@ -38,6 +38,8 @@ class Finding(BaseModel):
     cvss_score: float | None = Field(default=None, ge=0.0, le=10.0)
     references: list[str] = Field(default_factory=list)
     raw_data: dict[str, Any] = Field(default_factory=dict)
+    osv_references: list[str] = Field(default_factory=list)
+    osv_data: list[dict[str, Any]] = Field(default_factory=list)
 
     model_config = {"frozen": True}
 

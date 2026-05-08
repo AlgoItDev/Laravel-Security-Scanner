@@ -1,8 +1,9 @@
 """
 Check: Dangerous HTTP methods enabled.
 
-Checks if dangerous HTTP methods (PUT, DELETE, TRACE, etc.) 
+Checks if dangerous HTTP methods (PUT, DELETE, TRACE, PATCH)
 are accessible, which could indicate misconfigured server.
+OPTIONS is allowed (used for CORS preflight).
 Severity: MEDIUM
 """
 from __future__ import annotations
@@ -17,51 +18,31 @@ class HTTPMethodsCheck(BaseCheck):
     CHECK_ID = "HTTP_METHODS"
     TITLE = "Dangerous HTTP Methods Enabled"
 
-    DANGEROUS_METHODS = ["PUT", "DELETE", "TRACE", "OPTIONS", "PATCH"]
-    
+    DANGEROUS_METHODS = ["PUT", "DELETE", "TRACE", "PATCH"]
+
     async def run(self, target: ScanTarget) -> Finding:
-        """
-        Check if dangerous HTTP methods are accessible.
-        """
         exposed_methods = []
         evidence_details = []
-        
+
         for method in self.DANGEROUS_METHODS:
             url = target.url
             try:
-                # Use request method
-                if method == "PUT":
-                    resp = await self._client.put(url, headers=target.headers)
-                elif method == "DELETE":
-                    resp = await self._client.delete(url, headers=target.headers)
-                elif method == "TRACE":
-                    # httpx doesn't support TRACE directly, use request
-                    resp = await self._client.request("TRACE", url, headers=target.headers)
-                elif method == "OPTIONS":
-                    resp = await self._client.options(url, headers=target.headers)
-                elif method == "PATCH":
-                    resp = await self._client.patch(url, headers=target.headers)
-                else:
-                    continue
-                    
-                logger.debug(f"[{self.CHECK_ID}] {method} {url} → HTTP {resp.status_code}")
-                
-                # If method is not allowed, should return 405 or 501
+                resp = await self._client.request(method, url, headers=target.headers)
+                logger.debug(f"[{self.CHECK_ID}] {method} {url} -> HTTP {resp.status_code}")
+
                 if resp.status_code not in [405, 501, 403, 404]:
-                    # Check if response looks like an error (not a valid endpoint)
                     if resp.status_code == 200:
                         exposed_methods.append(method)
                         evidence_details.append(f"{method} method returned 200")
                     elif resp.status_code == 204:
-                        # Success with no content - method might be enabled
                         exposed_methods.append(method)
                         evidence_details.append(f"{method} method returned 204 (No Content)")
-                        
+
             except httpx.TimeoutException:
                 logger.warning(f"[{self.CHECK_ID}] Timeout for {method} {url}")
             except httpx.RequestError as exc:
                 logger.warning(f"[{self.CHECK_ID}] Request error for {method} {url}: {exc}")
-        
+
         if exposed_methods:
             return Finding(
                 check_id=self.CHECK_ID,
@@ -88,7 +69,7 @@ class HTTPMethodsCheck(BaseCheck):
                     "https://laravel.com/docs/routing#available-router-methods",
                 ],
             )
-        
+
         return Finding(
             check_id=self.CHECK_ID,
             title=self.TITLE,

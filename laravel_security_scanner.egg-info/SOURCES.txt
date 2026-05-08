@@ -15,6 +15,7 @@ app/services/scanner.py
 app/services/checks/__init__.py
 app/services/checks/base.py
 app/services/checks/composer_lock_cve.py
+app/services/checks/cors_misconfig.py
 app/services/checks/csrf_protection.py
 app/services/checks/debug_mode.py
 app/services/checks/debugbar_exposed.py
@@ -22,14 +23,19 @@ app/services/checks/env_exposed.py
 app/services/checks/horizon_exposed.py
 app/services/checks/http_methods.py
 app/services/checks/insecure_config.py
+app/services/checks/jwt_analysis.py
 app/services/checks/laravel_version.py
 app/services/checks/mix_manifest_exposed.py
 app/services/checks/nova_exposed.py
+app/services/checks/open_redirect.py
 app/services/checks/rate_limiting.py
 app/services/checks/security_headers.py
 app/services/checks/sensitive_files.py
 app/services/checks/session_security.py
+app/services/checks/sql_injection_blind.py
+app/services/checks/subdomain_enum.py
 app/services/checks/telescope_exposed.py
+app/services/checks/xss_reflected.py
 app/utils/__init__.py
 app/utils/url.py
 laravel_security_scanner.egg-info/PKG-INFO

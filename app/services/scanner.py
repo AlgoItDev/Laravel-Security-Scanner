@@ -28,10 +28,10 @@ class ScannerService:
         check_ids: list[str] | None = None,
         timeout: int | None = None,
         max_concurrent: int | None = None,
+        cache_ttl: int | None = None,
     ) -> None:
         self._check_classes = checks or ALL_CHECKS
         if check_ids:
-            # Filter checks by CHECK_ID
             self._check_classes = [
                 cls for cls in self._check_classes
                 if cls.CHECK_ID in check_ids
@@ -40,6 +40,7 @@ class ScannerService:
                 logger.warning(f"No checks found matching IDs: {check_ids}. Running all checks.")
                 self._check_classes = checks or ALL_CHECKS
         self._timeout = timeout or settings.SCAN_TIMEOUT
+        self._cache_ttl = cache_ttl if cache_ttl is not None else settings.OSV_CACHE_TTL_HOURS
         self._semaphore = asyncio.Semaphore(max_concurrent or settings.CONCURRENT_CHECKS)
 
     async def scan(self, target: ScanTarget) -> ScanResult:
@@ -87,7 +88,10 @@ class ScannerService:
                 async def _run_check_with_progress(check_cls, target, progress, task):
                     async with self._semaphore:
                         logger.debug(f"Running check: {check_cls.CHECK_ID}")
-                        finding = await check_cls(client).run(target)
+                        check = check_cls(client)
+                        if check_cls.CHECK_ID == "COMPOSER_CVE" and self._cache_ttl is not None:
+                            check.set_cache_ttl(self._cache_ttl)
+                        finding = await check.run(target)
                         progress.advance(task)
                         return finding
                 

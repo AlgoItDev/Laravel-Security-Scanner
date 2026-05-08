@@ -5,10 +5,40 @@ All notable changes to the Laravel Security Scanner project will be documented i
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.3.0] - 2026-05-08
 
 ### Added
-- Nothing unreleased yet.
+- **OSV API Integration** for `COMPOSER_CVE` check (hybrid approach):
+  - First checks local `cve_database.json`
+  - Falls back to OSV.dev API for unknown packages
+  - Proper semver comparison using `packaging` library
+  - File-based cache with configurable TTL (`--cache-ttl`)
+  - OSV references and raw data added to findings
+
+- **`--cache-ttl` CLI argument**:
+  - Default: 24 hours
+  - Cache file: `osv_cache.json` in project root
+  - Set to 0 to disable cache
+
+- **22 new unit tests** for OSV integration:
+  - Version parsing tests
+  - Cache TTL tests
+  - OSV response parsing tests
+
+### Changed
+- `composer_lock_cve.py` refactored with OSV integration
+- `models/scan.py` - Added `osv_references` and `osv_data` fields to Finding
+- `settings.py` - Added OSV configuration (cache TTL, API URL, ecosystem)
+- `scanner.py` - Added `cache_ttl` parameter support
+- `requirements.txt` - Added `packaging>=24.0` dependency
+
+### Fixed
+- `datetime.utcnow()` deprecated warnings → `datetime.now(timezone.utc)` in composer_lock_cve.py
+- `session_security.py` - Fixed cookie iteration (`resp.cookies.items()` instead of `.values()`)
+- `http_methods.py` - Simplified method dispatch, removed OPTIONS from dangerous methods
+- `csrf_protection.py` - Fixed regex to properly match GET forms and detect CSRF tokens
+- Fixed 7 failing unit tests (session security, HTTP methods, CSRF protection)
+- Total tests increased from 93 to 100
 
 ## [1.2.0] - 2026-05-08
 

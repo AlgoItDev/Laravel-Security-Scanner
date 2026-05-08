@@ -17,7 +17,7 @@ class Settings(BaseSettings):
 
     # App
     APP_NAME: str = "Laravel Security Scanner"
-    APP_VERSION: str = "1.0.0"
+    APP_VERSION: str = "1.3.0"
     DEBUG: bool = False
 
     # Scanner Behaviour
@@ -33,6 +33,12 @@ class Settings(BaseSettings):
     REPORT_OUTPUT_DIR: Path = Field(default=Path("reports"), description="Report output directory")
     LOG_LEVEL: str = Field(default="INFO", description="Logging level")
     LOG_DIR: Path = Field(default=Path("logs"), description="Log directory")
+
+    # OSV API
+    OSV_CACHE_FILE: Path = Field(default=Path("osv_cache.json"), description="OSV API cache file")
+    OSV_CACHE_TTL_HOURS: int = Field(default=24, description="OSV cache TTL in hours")
+    OSV_API_URL: str = "https://api.osv.dev/v1/query"
+    OSV_ECOSYSTEM: str = "Packagist"
 
 
 settings = Settings()

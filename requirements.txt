@@ -5,6 +5,9 @@ pydantic-settings>=2.3.0
 loguru>=0.7.2
 rich>=13.0.0
 
+# Version parsing for semver
+packaging>=24.0
+
 # Testing
 pytest>=8.2.0
 pytest-asyncio>=0.23.0

@@ -40,31 +40,29 @@ class CSRFProtectionCheck(BaseCheck):
             import re
             
             # Find all forms
-            forms = re.findall(r'<form[^>]*>(.*?)</form>', body, re.DOTALL)
+            forms = re.findall(r'(<form[^>]*>.*?</form>)', body, re.DOTALL)
             for form_html in forms:
-                # Skip forms with method GET or no method (default GET)
                 method_match = re.search(r'method=["\']?(GET|get)["\']?', form_html)
                 if method_match:
-                    continue  # GET forms don't need CSRF
-                
-                # Check for CSRF token field
+                    continue
+
                 has_token = (
-                    '_token' in form_html or 
+                    '_token' in form_html or
                     'csrf_token' in form_html or
                     'csrf-token' in form_html or
                     'name="_token"' in form_html or
                     'name="csrf' in form_html
                 )
-                
+
                 if not has_token:
                     issues.append("Form without CSRF token detected")
-                    break  # One is enough
+                    break
             
             # Check 2: Check for Laravel's CSRF cookie
             xsrf_cookie_present = False
-            if 'XSRF-TOKEN' in resp.cookies:
+            if 'XSRF-TOKEN' in resp.cookies.keys() or 'XSRF-TOKEN' in resp.headers.get('set-cookie', ''):
                 xsrf_cookie_present = True
-            elif 'xsrf_token' in resp.cookies:
+            elif 'xsrf_token' in resp.cookies.keys() or 'xsrf_token' in resp.headers.get('set-cookie', ''):
                 xsrf_cookie_present = True
             
             # Check 3: Look for meta tag with CSRF token
@@ -100,35 +98,14 @@ class CSRFProtectionCheck(BaseCheck):
                         "https://owasp.org/www-project-top-ten/2017/A5_2017-Broken_Access_Control",
                     ],
                 )
-            elif not xsrf_cookie_present and not meta_csrf:
-                # Less severe - might still have protection but not visible
-                return Finding(
-                    check_id=self.CHECK_ID,
-                    title=self.TITLE,
-                    severity=Severity.LOW,
-                    status=CheckStatus.VULNERABLE,
-                    description=(
-                        "Could not verify CSRF protection. "
-                        "No CSRF token cookie or meta tag detected."
-                    ),
-                    evidence="No XSRF-TOKEN cookie or meta tag found",
-                    remediation=(
-                        "Verify CSRF protection is enabled. "
-                        "Check if Laravel's CSRF middleware is active."
-                    ),
-                    cvss_score=3.0,
-                    references=[
-                        "https://laravel.com/docs/csrf",
-                    ],
-                )
-            else:
-                return Finding(
-                    check_id=self.CHECK_ID,
-                    title=self.TITLE,
-                    severity=Severity.HIGH,
-                    status=CheckStatus.SAFE,
-                    description="CSRF protection appears to be properly configured.",
-                )
+
+            return Finding(
+                check_id=self.CHECK_ID,
+                title=self.TITLE,
+                severity=Severity.HIGH,
+                status=CheckStatus.SAFE,
+                description="CSRF protection appears to be properly configured.",
+            )
                 
         except httpx.TimeoutException:
             logger.warning(f"[{self.CHECK_ID}] Timeout for {target.url}")
