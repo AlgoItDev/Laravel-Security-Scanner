@@ -209,10 +209,9 @@ class ComposerLockCVEScanCheck(BaseCheck):
             return
 
         self._osv_cache = {}
-        cache_path = Path(self.CVED_DB_PATH).parent.parent / settings.OSV_CACHE_FILE
-        cache_path = cache_path.parent.parent / settings.OSV_CACHE_FILE
+        cache_path = Path(settings.OSV_CACHE_FILE).resolve()
 
-        if cache_path.exists():
+        if cache_path.exists() and self.CACHE_TTL_HOURS > 0:
             try:
                 with open(cache_path, "r", encoding="utf-8") as f:
                     raw_cache = json.load(f)
@@ -228,7 +227,7 @@ class ComposerLockCVEScanCheck(BaseCheck):
                 logger.warning(f"[{self.CHECK_ID}] Failed to load OSV cache: {e}")
 
     def _save_osv_cache(self) -> None:
-        if self._osv_cache is None:
+        if self._osv_cache is None or self.CACHE_TTL_HOURS == 0:
             return
 
         cache_path = Path(settings.OSV_CACHE_FILE).resolve()
