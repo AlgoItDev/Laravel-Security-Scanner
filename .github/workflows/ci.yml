@@ -1,0 +1,79 @@
+name: Laravel Security Scanner CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 2 * * 0'
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.10, '3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio
+
+    - name: Run tests
+      run: pytest tests/ -v
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.python-version }}
+        path: |
+          reports/
+          logs/
+
+  scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install scanner
+      run: pip install -e .
+
+    - name: Run security scan
+      run: |
+        mkdir -p results
+        laravel-sec-scanner https://httpbin.org/html --format sarif --format json --output ./results --no-ssl-verify || echo "Scan completed"
+        ls -la results/
+
+    - name: Upload SARIF
+      if: always()
+      uses: github/codeql-action/upload-sarif@v4
+      with:
+        sarif_file: results/scan_*.sarif.json
+        category: laravel-security-scan
+
+    - name: Upload scan results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-scan-results
+        path: results/

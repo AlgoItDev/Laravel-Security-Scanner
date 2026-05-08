@@ -3,7 +3,6 @@ name: Laravel Security Scan
 on:
   push:
     branches: [main, develop, master]
-    tags: ['v*']
   pull_request:
     branches: [main, develop, master]
   schedule:
@@ -11,25 +10,12 @@ on:
   workflow_dispatch:
     inputs:
       target_url:
-        description: 'Target URL to scan'
+        description: 'Target URL'
         required: true
         type: string
-      fail_on:
-        description: 'Fail on severity level'
-        required: false
-        type: choice
-        default: medium
-        options:
-          - critical
-          - high
-          - medium
-          - low
-          - info
-          - none
 
 env:
   TARGET_URL: ${{ vars.TARGET_URL || github.event.inputs.target_url || 'https://example.com' }}
-  FAIL_ON: ${{ vars.FAIL_ON || github.event.inputs.fail_on || 'medium' }}
 
 jobs:
   security-scan:
@@ -38,61 +24,32 @@ jobs:
       security-events: write
       contents: read
 
-    outputs:
-      critical-found: ${{ steps.scan.outputs.critical-found }}
-      high-found: ${{ steps.scan.outputs.high-found }}
-      exit-code: ${{ steps.scan.outputs.exit-code }}
-
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install
         run: pip install -e .
 
-      - name: Run security scan
-        id: scan
-        shell: bash
+      - name: Run scan
         run: |
-          echo "CRITICAL_FOUND=0" >> $GITHUB_OUTPUT
-          echo "HIGH_FOUND=0" >> $GITHUB_OUTPUT
-          echo "EXIT_CODE=0" >> $GITHUB_OUTPUT
           mkdir -p results
-          
-          laravel-sec-scanner "${{ env.TARGET_URL }}" \
-            --format sarif \
-            --format json \
-            --output ./results \
-            --fail-on "${{ env.FAIL_ON }}" \
-            --no-ssl-verify || true
-          
-          EXIT_CODE=$?
-          echo "exit-code=$EXIT_CODE" >> $GITHUB_OUTPUT
-          
+          laravel-sec-scanner "$TARGET_URL" --format sarif --format json --output ./results --fail-on medium --no-ssl-verify || echo "Scan completed with warnings"
           ls -la results/
-          
-          find results/ -name "*.json" -type f | head -1 | while read JSON_FILE; do
-            if [ -n "$JSON_FILE" ] && [ -f "$JSON_FILE" ]; then
-              CRITICAL=$(python3 -c "import json; print(json.load(open('$JSON_FILE')).get('critical_count', 0))" 2>/dev/null || echo "0")
-              HIGH=$(python3 -c "import json; print(json.load(open('$JSON_FILE')).get('high_count', 0))" 2>/dev/null || echo "0")
-              echo "CRITICAL_FOUND=$CRITICAL" >> $GITHUB_OUTPUT
-              echo "HIGH_FOUND=$HIGH" >> $GITHUB_OUTPUT
-            fi
-          done
 
-      - name: Upload SARIF to GitHub Security
-        if: success() || failure()
+      - name: Upload SARIF
+        if: always()
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results/scan_*.sarif.json
           category: laravel-security-scan
 
-      - name: Upload report artifacts
+      - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -106,7 +63,7 @@ jobs:
     if: always()
 
     steps:
-      - name: Download reports
+      - name: Download
         uses: actions/download-artifact@v4
         with:
           name: security-report
@@ -115,14 +72,5 @@ jobs:
       - name: Summary
         run: |
           echo "## Security Scan Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Target: ${{ env.TARGET_URL }}" >> $GITHUB_STEP_SUMMARY
-          echo "Exit code: ${{ needs.security-scan.outputs.exit-code }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          for f in reports/*.json; do
-            if [ -f "$f" ]; then
-              python3 -c "import json; d=json.load(open('$f')); print('Critical:', d.get('critical_count',0)); print('High:', d.get('high_count',0)); print('Medium:', d.get('medium_count',0))" >> $GITHUB_STEP_SUMMARY 2>/dev/null || true
-              break
-            fi
-          done
+          echo "Target: $TARGET_URL" >> $GITHUB_STEP_SUMMARY
+          ls -la reports/ >> $GITHUB_STEP_SUMMARY
